@@ -1,0 +1,3 @@
+.ad-grid-wrap{max-height:420px;overflow:auto;border-radius:14px;border:1px solid rgba(148,163,184,.35)}
+.ad-grid{width:100%;border-collapse:collapse}.ad-grid th{position:sticky;top:0;background:#f8fafc;z-index:2}.ad-grid th,.ad-grid td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left}.ad-grid tbody tr:hover{background:rgba(124,140,255,.08)}
+#ad-grid-search{width:100%;margin-bottom:10px}

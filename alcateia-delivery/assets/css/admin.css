@@ -1,0 +1,3 @@
+.alc-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:12px 0}.alc-cards .card{background:#fff;padding:12px;border:1px solid #ddd;border-radius:8px}
+.alcateia-delivery-simulator{display:grid;gap:8px;max-width:520px;padding:16px;border:1px solid #ddd;border-radius:12px;background:#fff}
+.alc-loading{opacity:.8}
