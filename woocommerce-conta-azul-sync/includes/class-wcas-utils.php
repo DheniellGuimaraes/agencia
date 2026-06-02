@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 class WCAS_Utils {
 	public const OPTION_SETTINGS = 'wcas_settings';
 	public const OPTION_TOKENS   = 'wcas_tokens';
+	public const OPTION_OAUTH_DEBUG = 'wcas_oauth_debug';
 	public const NONCE_ACTION    = 'wcas_admin_action';
 	public const SECRET_PREFIX   = 'wcas:v1:';
 
@@ -176,9 +177,9 @@ class WCAS_Utils {
 				$key_string = (string) $key;
 				if ( 'authorization_url' === $key_string ) {
 					$masked[ $key ] = is_scalar( $item ) ? self::redact_url_query( (string) $item ) : '';
-				} elseif ( preg_match( '/client_id/i', $key_string ) ) {
+				} elseif ( preg_match( '/client_id|state|code/i', $key_string ) ) {
 					$masked[ $key ] = self::mask_identifier( is_scalar( $item ) ? (string) $item : '' );
-				} elseif ( preg_match( '/token|secret|authorization|password|cpf|cnpj|document|email|phone|telefone|state|code/i', $key_string ) ) {
+				} elseif ( preg_match( '/access_token|refresh_token|secret|authorization|password|cpf|cnpj|document|email|phone|telefone/i', $key_string ) ) {
 					$masked[ $key ] = self::mask_scalar( $item );
 				} else {
 					$masked[ $key ] = self::mask_sensitive( $item );
@@ -277,6 +278,40 @@ class WCAS_Utils {
 		$key = hash( 'sha256', wp_salt( 'auth' ), true );
 		$decrypted = openssl_decrypt( $ciphertext, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv );
 		return false === $decrypted ? '' : $decrypted;
+	}
+
+
+	/**
+	 * Merge and persist OAuth debug information for the admin dashboard.
+	 *
+	 * @param array<string, mixed> $data Debug data.
+	 */
+	public static function update_oauth_debug( array $data ): void {
+		$current = get_option( self::OPTION_OAUTH_DEBUG, array() );
+		$current = is_array( $current ) ? $current : array();
+		self::update_option_no_autoload( self::OPTION_OAUTH_DEBUG, array_merge( $current, self::mask_sensitive( $data ) ) );
+	}
+
+	/**
+	 * Read OAuth debug information.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function get_oauth_debug(): array {
+		$debug = get_option( self::OPTION_OAUTH_DEBUG, array() );
+		return is_array( $debug ) ? $debug : array();
+	}
+
+	/**
+	 * Create a compact JSON summary for logs/debug cards.
+	 *
+	 * @param mixed $value Value to summarize.
+	 */
+	public static function summarize( mixed $value, int $max_length = 500 ): string {
+		$value = self::mask_sensitive( $value );
+		$summary = is_scalar( $value ) ? (string) $value : (string) wp_json_encode( $value );
+		$summary = wp_strip_all_tags( $summary );
+		return wp_html_excerpt( $summary, $max_length, '…' );
 	}
 
 	/**

@@ -423,6 +423,8 @@ class WCAS_Admin {
 				</form>
 			</div>
 
+			<?php $this->render_oauth_debug_card(); ?>
+
 			<div class="wcas-log-filters" role="search" aria-label="<?php esc_attr_e( 'Filtros de logs', 'woocommerce-conta-azul-sync' ); ?>">
 				<label for="wcas-log-search"><?php esc_html_e( 'Buscar', 'woocommerce-conta-azul-sync' ); ?></label>
 				<input id="wcas-log-search" type="search" class="wcas-log-search" placeholder="<?php esc_attr_e( 'Mensagem, pedido ou contexto...', 'woocommerce-conta-azul-sync' ); ?>" />
@@ -466,6 +468,38 @@ class WCAS_Admin {
 				</div>
 			<?php endif; ?>
 		</section>
+		<?php
+	}
+
+
+	/** Render OAuth debug summary card. */
+	private function render_oauth_debug_card(): void {
+		$debug = WCAS_Utils::get_oauth_debug();
+		$items = array(
+			__( 'Último callback recebido', 'woocommerce-conta-azul-sync' ) => $debug['last_callback_at'] ?? __( 'Nenhum callback recebido', 'woocommerce-conta-azul-sync' ),
+			__( 'Último state recebido', 'woocommerce-conta-azul-sync' ) => $debug['last_state_received'] ?? '-',
+			__( 'Último code recebido', 'woocommerce-conta-azul-sync' ) => $debug['last_code_received'] ?? '-',
+			__( 'Último erro recebido', 'woocommerce-conta-azul-sync' ) => $debug['last_error_received'] ?? '-',
+			__( 'Último status HTTP do token endpoint', 'woocommerce-conta-azul-sync' ) => $debug['last_token_http_status'] ?? '-',
+			__( 'Última validação do state', 'woocommerce-conta-azul-sync' ) => $debug['last_state_validation'] ?? '-',
+			__( 'Token endpoint', 'woocommerce-conta-azul-sync' ) => $debug['last_token_endpoint'] ?? '-',
+			__( 'Resumo da última resposta', 'woocommerce-conta-azul-sync' ) => $debug['last_token_response'] ?? '-',
+		);
+		?>
+		<div class="wcas-oauth-debug" aria-label="<?php esc_attr_e( 'OAuth Debug', 'woocommerce-conta-azul-sync' ); ?>">
+			<div class="wcas-oauth-debug__header">
+				<span class="wcas-eyebrow"><?php esc_html_e( 'OAuth Debug', 'woocommerce-conta-azul-sync' ); ?></span>
+				<strong><?php esc_html_e( 'Resumo do último callback e token exchange', 'woocommerce-conta-azul-sync' ); ?></strong>
+			</div>
+			<div class="wcas-oauth-debug__grid">
+				<?php foreach ( $items as $label => $value ) : ?>
+					<div class="wcas-oauth-debug__item">
+						<span><?php echo esc_html( (string) $label ); ?></span>
+						<code><?php echo esc_html( is_scalar( $value ) ? (string) $value : WCAS_Utils::summarize( $value, 160 ) ); ?></code>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
 		<?php
 	}
 
