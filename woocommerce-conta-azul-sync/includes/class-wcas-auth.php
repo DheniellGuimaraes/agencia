@@ -47,6 +47,53 @@ class WCAS_Auth {
 		return $url;
 	}
 
+
+	/**
+	 * Register an optional REST callback route for diagnostics and alternate OAuth redirect usage.
+	 */
+	public function register_rest_routes(): void {
+		register_rest_route(
+			'wcas/v1',
+			'/oauth/callback',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'handle_rest_callback' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+	}
+
+	/**
+	 * REST callback diagnostic endpoint.
+	 *
+	 * The active Redirect URI remains the URL saved in settings. This route is registered so
+	 * administrators can choose a REST callback URL after validating it in the dashboard.
+	 */
+	public function handle_rest_callback( WP_REST_Request $request ): WP_REST_Response {
+		WCAS_Logger::diagnostic(
+			'oauth',
+			'rest_callback_received',
+			'started',
+			'Callback OAuth2 recebido na rota REST diagnóstica.',
+			array(
+				'code_present'  => null !== $request->get_param( 'code' ),
+				'state_present' => null !== $request->get_param( 'state' ),
+				'error_present' => null !== $request->get_param( 'error' ),
+				'code'          => (string) $request->get_param( 'code' ),
+				'state'         => (string) $request->get_param( 'state' ),
+				'error'         => (string) $request->get_param( 'error' ),
+			)
+		);
+
+		return new WP_REST_Response(
+			array(
+				'success' => false,
+				'message' => __( 'Rota REST de callback registrada para diagnóstico. Configure esta URL como Redirect URI apenas após adaptar o processamento REST do OAuth.', 'woocommerce-conta-azul-sync' ),
+			),
+			200
+		);
+	}
+
 	/**
 	 * Process OAuth callback request.
 	 */
