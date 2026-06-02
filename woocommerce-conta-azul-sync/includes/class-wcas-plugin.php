@@ -31,7 +31,6 @@ class WCAS_Plugin {
 		load_plugin_textdomain( WCAS_TEXT_DOMAIN, false, dirname( plugin_basename( WCAS_PLUGIN_FILE ) ) . '/languages' );
 
 		$this->auth = new WCAS_Auth();
-		add_action( 'rest_api_init', array( $this->auth, 'register_rest_routes' ) );
 		$this->auth->maybe_handle_callback();
 
 		$client    = new WCAS_API_Client( $this->auth );

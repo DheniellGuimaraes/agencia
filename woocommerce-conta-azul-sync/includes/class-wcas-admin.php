@@ -449,6 +449,7 @@ class WCAS_Admin {
 				</form>
 			</div>
 
+			<?php $this->render_oauth_flow_inspector_card(); ?>
 			<?php $this->render_oauth_debug_card(); ?>
 			<?php $this->render_oauth_endpoints_card(); ?>
 
@@ -498,6 +499,46 @@ class WCAS_Admin {
 		<?php
 	}
 
+
+
+	/** Render OAuth Flow Inspector card. */
+	private function render_oauth_flow_inspector_card(): void {
+		$settings = WCAS_Utils::get_settings();
+		$diagnostic = $this->get_oauth_endpoint_diagnostics( $settings );
+		$debug = WCAS_Utils::get_oauth_debug();
+		$last_callback = (string) ( $debug['last_callback_at'] ?? '' );
+		$items = array(
+			__( 'Callback efetivamente utilizado pelo OAuth', 'woocommerce-conta-azul-sync' ) => $diagnostic['effective_redirect_uri'],
+			__( 'Função PHP responsável pelo callback', 'woocommerce-conta-azul-sync' ) => $diagnostic['callback_handler'],
+			__( 'Onde o parâmetro code é capturado', 'woocommerce-conta-azul-sync' ) => 'WCAS_Auth::maybe_handle_callback() → $_GET[code]',
+			__( 'Onde o parâmetro state é validado', 'woocommerce-conta-azul-sync' ) => 'WCAS_Auth::maybe_handle_callback() → get_transient(wcas_oauth_state_{state})',
+			__( 'Onde ocorre token_exchange', 'woocommerce-conta-azul-sync' ) => 'WCAS_Auth::exchange_code() → WCAS_Auth::token_request()',
+			__( 'Endpoint de token utilizado', 'woocommerce-conta-azul-sync' ) => (string) ( $settings['token_url'] ?? WCAS_Utils::TOKEN_URL ),
+			__( 'Callback morto/não utilizado', 'woocommerce-conta-azul-sync' ) => $diagnostic['dead_callback'],
+			__( 'Status de recebimento', 'woocommerce-conta-azul-sync' ) => '' === $last_callback ? __( 'Nenhum callback OAuth foi recebido pela aplicação', 'woocommerce-conta-azul-sync' ) : sprintf( __( 'Último callback recebido em %s', 'woocommerce-conta-azul-sync' ), $last_callback ),
+		);
+		?>
+		<div class="wcas-oauth-debug wcas-oauth-flow-inspector" aria-label="<?php esc_attr_e( 'OAuth Flow Inspector', 'woocommerce-conta-azul-sync' ); ?>">
+			<div class="wcas-oauth-debug__header">
+				<div>
+					<span class="wcas-eyebrow"><?php esc_html_e( 'OAuth Flow Inspector', 'woocommerce-conta-azul-sync' ); ?></span>
+					<strong><?php esc_html_e( 'Auditoria do callback que processa code, state e token exchange', 'woocommerce-conta-azul-sync' ); ?></strong>
+				</div>
+			</div>
+			<?php if ( '' === $last_callback ) : ?>
+				<div class="wcas-empty-state wcas-empty-state--compact"><strong><?php esc_html_e( 'Nenhum callback OAuth foi recebido pela aplicação', 'woocommerce-conta-azul-sync' ); ?></strong><p><?php esc_html_e( 'Se a Conta Azul redirecionou para outra URL, copie a URL efetiva abaixo e cadastre-a no Portal do Desenvolvedor.', 'woocommerce-conta-azul-sync' ); ?></p></div>
+			<?php endif; ?>
+			<div class="wcas-oauth-debug__grid">
+				<?php foreach ( $items as $label => $value ) : ?>
+					<div class="wcas-oauth-debug__item">
+						<span><?php echo esc_html( (string) $label ); ?></span>
+						<code><?php echo esc_html( (string) $value ); ?></code>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
+		<?php
+	}
 
 	/** Render OAuth debug summary card. */
 	private function render_oauth_debug_card(): void {
@@ -638,9 +679,10 @@ class WCAS_Admin {
 	/** Build OAuth endpoint diagnostics. */
 	private function get_oauth_endpoint_diagnostics( array $settings ): array {
 		$configured_redirect = (string) ( $settings['redirect_uri'] ?? '' );
+		$default_admin_callback = admin_url( 'admin.php?page=wcas-conta-azul' );
 		$rest_route = rest_url( 'wcas/v1/oauth/callback' );
-		$is_rest = untrailingslashit( $configured_redirect ) === untrailingslashit( $rest_route );
 		$is_admin_page = false !== strpos( $configured_redirect, 'admin.php?page=wcas-conta-azul' );
+		$is_rest = untrailingslashit( $configured_redirect ) === untrailingslashit( $rest_route );
 		$admin_actions = array( 'admin_post_wcas_connect', 'admin_post_wcas_connect_conta_azul', 'admin_post_wcas_validate_callback' );
 		$registered_admin_actions = array();
 		foreach ( $admin_actions as $action ) {
@@ -648,25 +690,32 @@ class WCAS_Admin {
 				$registered_admin_actions[] = $action;
 			}
 		}
-		$rest_hook_registered = has_action( 'rest_api_init' );
+
 		$callback_exists = '' !== $configured_redirect && (bool) wp_http_validate_url( $configured_redirect );
-		$hook_registered = method_exists( $this->auth, 'maybe_handle_callback' ) && ( $is_admin_page || ! $is_rest );
-		$rest_route_registered = method_exists( $this->auth, 'register_rest_routes' ) && (bool) $rest_hook_registered;
+		$hook_registered = $is_admin_page && method_exists( $this->auth, 'maybe_handle_callback' );
+		$rest_route_registered = false;
+		$callback_handler = $hook_registered ? 'WCAS_Auth::maybe_handle_callback' : 'Nenhum handler ativo para token exchange nesta URL';
+		$dead_callback = 'REST API /wp-json/wcas/v1/oauth/callback não processa token exchange e foi desativado como callback OAuth.';
+		if ( ! $is_admin_page && ! $is_rest ) {
+			$dead_callback .= ' A Redirect URI configurada não corresponde ao callback admin efetivo.';
+		}
 
 		return array(
 			'configured_redirect_uri' => $configured_redirect,
 			'effective_redirect_uri'  => $configured_redirect,
-			'callback_handler'        => $is_rest ? 'WCAS_Auth::handle_rest_callback' : 'WCAS_Auth::maybe_handle_callback',
-			'callback_type'           => $is_rest ? 'REST API' : 'admin_page',
+			'default_admin_callback'  => $default_admin_callback,
+			'callback_handler'        => $callback_handler,
+			'callback_type'           => $is_admin_page ? 'admin_page' : ( $is_rest ? 'REST API desativado' : 'desconhecido' ),
 			'admin_post_actions'      => $registered_admin_actions,
-			'rest_routes'             => array( '/wcas/v1/oauth/callback' ),
-			'rest_namespace'          => 'wcas/v1',
+			'rest_routes'             => array(),
+			'rest_namespace'          => 'nenhum REST namespace ativo para OAuth',
 			'rest_route_url'          => $rest_route,
 			'expected_return_url'     => $configured_redirect,
 			'callback_exists'         => $callback_exists,
 			'hook_registered'         => $hook_registered,
 			'rest_route_registered'   => $rest_route_registered,
 			'url_accessible'          => $callback_exists,
+			'dead_callback'           => $dead_callback,
 		);
 	}
 

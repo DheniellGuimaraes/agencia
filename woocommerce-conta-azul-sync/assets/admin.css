@@ -775,3 +775,9 @@
 		grid-template-columns: 1fr;
 	}
 }
+
+.wcas-empty-state--compact {
+	margin-bottom: 14px;
+	min-height: 0;
+	padding: 14px;
+}
