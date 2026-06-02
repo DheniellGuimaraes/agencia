@@ -212,9 +212,10 @@ class WCAS_Admin {
 			$diagnostic['callback_exists'] && $diagnostic['hook_registered'] ? 'success' : 'warning',
 			'Validação de callback OAuth executada para identificar a URL que deve ser cadastrada no Portal da Conta Azul.',
 			array(
-				'callback'                  => $diagnostic['configured_redirect_uri'],
+				'callback'                  => $diagnostic['expected_return_url'],
 				'type'                      => $diagnostic['callback_type'],
-				'action_registered'         => $diagnostic['callback_handler'],
+				'action_registered'         => 'admin_post_wcas_oauth_callback',
+				'callback_handler'          => $diagnostic['callback_handler'],
 				'namespace_rest_registered' => $diagnostic['rest_namespace'],
 				'callback_exists'           => $diagnostic['callback_exists'],
 				'hook_registered'           => $diagnostic['hook_registered'],
@@ -531,8 +532,8 @@ class WCAS_Admin {
 		$items = array(
 			__( 'Callback efetivamente utilizado pelo OAuth', 'woocommerce-conta-azul-sync' ) => $diagnostic['effective_redirect_uri'],
 			__( 'Função PHP responsável pelo callback', 'woocommerce-conta-azul-sync' ) => $diagnostic['callback_handler'],
-			__( 'Onde o parâmetro code é capturado', 'woocommerce-conta-azul-sync' ) => 'WCAS_Auth::maybe_handle_callback() → $_GET[code]',
-			__( 'Onde o parâmetro state é validado', 'woocommerce-conta-azul-sync' ) => 'WCAS_Auth::maybe_handle_callback() → get_transient(wcas_oauth_state_{state})',
+			__( 'Onde o parâmetro code é capturado', 'woocommerce-conta-azul-sync' ) => 'WCAS_Auth::handle_admin_post_callback() → process_oauth_callback() → $_GET[code]',
+			__( 'Onde o parâmetro state é validado', 'woocommerce-conta-azul-sync' ) => 'WCAS_Auth::handle_admin_post_callback() → process_oauth_callback() → get_transient(wcas_oauth_state_{state})',
 			__( 'Onde ocorre token_exchange', 'woocommerce-conta-azul-sync' ) => 'WCAS_Auth::exchange_code() → WCAS_Auth::token_request()',
 			__( 'Endpoint de token utilizado', 'woocommerce-conta-azul-sync' ) => (string) ( $settings['token_url'] ?? WCAS_Utils::TOKEN_URL ),
 			__( 'Callback morto/não utilizado', 'woocommerce-conta-azul-sync' ) => $diagnostic['dead_callback'],
@@ -598,6 +599,7 @@ class WCAS_Admin {
 		$settings = WCAS_Utils::get_settings();
 		$diagnostic = $this->get_oauth_endpoint_diagnostics( $settings );
 		$items = array(
+			__( 'URL para cadastrar na Conta Azul', 'woocommerce-conta-azul-sync' ) => $diagnostic['expected_return_url'],
 			__( 'Redirect URI configurado no plugin', 'woocommerce-conta-azul-sync' ) => $diagnostic['configured_redirect_uri'],
 			__( 'Redirect URI enviado para a Conta Azul', 'woocommerce-conta-azul-sync' ) => $diagnostic['effective_redirect_uri'],
 			__( 'Callback handler registrado', 'woocommerce-conta-azul-sync' ) => $diagnostic['callback_handler'],
@@ -699,12 +701,11 @@ class WCAS_Admin {
 
 	/** Build OAuth endpoint diagnostics. */
 	private function get_oauth_endpoint_diagnostics( array $settings ): array {
-		$configured_redirect = (string) ( $settings['redirect_uri'] ?? '' );
-		$default_admin_callback = admin_url( 'admin.php?page=wcas-conta-azul' );
-		$rest_route = rest_url( 'wcas/v1/oauth/callback' );
-		$is_admin_page = false !== strpos( $configured_redirect, 'admin.php?page=wcas-conta-azul' );
-		$is_rest = untrailingslashit( $configured_redirect ) === untrailingslashit( $rest_route );
-		$admin_actions = array( 'admin_post_wcas_connect', 'admin_post_wcas_connect_conta_azul', 'admin_post_wcas_validate_callback' );
+		$configured_redirect = WCAS_Utils::normalize_oauth_redirect_uri( (string) ( $settings['redirect_uri'] ?? '' ) );
+		$dedicated_callback  = WCAS_Utils::get_oauth_callback_url();
+		$legacy_admin_page   = admin_url( 'admin.php?page=wcas-conta-azul' );
+		$rest_route          = rest_url( 'wcas/v1/oauth/callback' );
+		$admin_actions       = array( 'admin_post_wcas_oauth_callback', 'admin_post_wcas_connect', 'admin_post_wcas_connect_conta_azul', 'admin_post_wcas_validate_callback' );
 		$registered_admin_actions = array();
 		foreach ( $admin_actions as $action ) {
 			if ( has_action( $action ) ) {
@@ -712,26 +713,23 @@ class WCAS_Admin {
 			}
 		}
 
-		$callback_exists = '' !== $configured_redirect && (bool) wp_http_validate_url( $configured_redirect );
-		$hook_registered = $is_admin_page && method_exists( $this->auth, 'maybe_handle_callback' );
+		$callback_exists       = '' !== $dedicated_callback && (bool) wp_http_validate_url( $dedicated_callback );
+		$hook_registered       = has_action( 'admin_post_wcas_oauth_callback' ) && method_exists( $this->auth, 'handle_admin_post_callback' );
 		$rest_route_registered = false;
-		$callback_handler = $hook_registered ? 'WCAS_Auth::maybe_handle_callback' : 'Nenhum handler ativo para token exchange nesta URL';
-		$dead_callback = 'REST API /wp-json/wcas/v1/oauth/callback não processa token exchange e foi desativado como callback OAuth.';
-		if ( ! $is_admin_page && ! $is_rest ) {
-			$dead_callback .= ' A Redirect URI configurada não corresponde ao callback admin efetivo.';
-		}
+		$callback_handler      = $hook_registered ? 'WCAS_Auth::handle_admin_post_callback → WCAS_Auth::process_oauth_callback' : 'Nenhum handler admin_post_wcas_oauth_callback ativo para token exchange';
+		$dead_callback         = 'wp-admin/admin.php?page=wcas-conta-azul é apenas compatibilidade legada e não deve ser cadastrado na Conta Azul. REST API /wp-json/wcas/v1/oauth/callback não registra token exchange.';
 
 		return array(
 			'configured_redirect_uri' => $configured_redirect,
-			'effective_redirect_uri'  => $configured_redirect,
-			'default_admin_callback'  => $default_admin_callback,
+			'effective_redirect_uri'  => $dedicated_callback,
+			'default_admin_callback'  => $legacy_admin_page,
 			'callback_handler'        => $callback_handler,
-			'callback_type'           => $is_admin_page ? 'admin_page' : ( $is_rest ? 'REST API desativado' : 'desconhecido' ),
+			'callback_type'           => 'admin_post',
 			'admin_post_actions'      => $registered_admin_actions,
 			'rest_routes'             => array(),
 			'rest_namespace'          => 'nenhum REST namespace ativo para OAuth',
 			'rest_route_url'          => $rest_route,
-			'expected_return_url'     => $configured_redirect,
+			'expected_return_url'     => $dedicated_callback,
 			'callback_exists'         => $callback_exists,
 			'hook_registered'         => $hook_registered,
 			'rest_route_registered'   => $rest_route_registered,
@@ -748,10 +746,12 @@ class WCAS_Admin {
 			'client_secret_exists' => '' !== (string) ( $settings['client_secret'] ?? '' ),
 			'redirect_uri_exists'  => '' !== (string) ( $settings['redirect_uri'] ?? '' ),
 			'redirect_uri'         => (string) ( $settings['redirect_uri'] ?? '' ),
+			'oauth_callback_url'   => WCAS_Utils::get_oauth_callback_url(),
 			'auth_url'             => (string) ( $settings['auth_url'] ?? '' ),
 			'nonce'                => 'passed',
 			'capability'           => 'manage_woocommerce passed',
 			'admin_post_action'    => 'wcas_connect_conta_azul',
+			'oauth_callback_action' => 'wcas_oauth_callback',
 		);
 	}
 

@@ -31,6 +31,7 @@ class WCAS_Plugin {
 		load_plugin_textdomain( WCAS_TEXT_DOMAIN, false, dirname( plugin_basename( WCAS_PLUGIN_FILE ) ) . '/languages' );
 
 		$this->auth = new WCAS_Auth();
+		add_action( 'admin_post_wcas_oauth_callback', array( $this->auth, 'handle_admin_post_callback' ) );
 		$this->auth->maybe_handle_callback();
 
 		$client    = new WCAS_API_Client( $this->auth );

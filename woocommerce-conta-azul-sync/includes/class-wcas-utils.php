@@ -35,7 +35,7 @@ class WCAS_Utils {
 			'enabled'                 => 'no',
 			'client_id'               => '',
 			'client_secret'           => '',
-			'redirect_uri'            => admin_url( 'admin.php?page=wcas-conta-azul' ),
+			'redirect_uri'            => self::get_oauth_callback_url(),
 			'environment'             => 'production',
 			'api_base_url'            => self::API_BASE_URL,
 			'auth_url'                => self::AUTHORIZATION_URL,
@@ -56,6 +56,55 @@ class WCAS_Utils {
 		);
 	}
 
+
+	/**
+	 * Dedicated OAuth callback URL that must be registered in Conta Azul.
+	 */
+	public static function get_oauth_callback_url(): string {
+		return admin_url( 'admin-post.php?action=wcas_oauth_callback' );
+	}
+
+	/**
+	 * Normalize legacy callbacks to the dedicated admin-post OAuth callback.
+	 */
+	public static function normalize_oauth_redirect_uri( string $redirect_uri ): string {
+		$redirect_uri = esc_url_raw( trim( $redirect_uri ) );
+		if ( '' === $redirect_uri || false !== strpos( $redirect_uri, 'admin.php?page=wcas-conta-azul' ) || false !== strpos( $redirect_uri, '/wp-json/wcas/v1/oauth/callback' ) ) {
+			return self::get_oauth_callback_url();
+		}
+		return $redirect_uri;
+	}
+
+	/**
+	 * Migrate old admin.php callback settings to the dedicated admin-post callback.
+	 *
+	 * @param array<string, mixed> $settings Raw settings.
+	 * @return array<string, mixed>
+	 */
+	private static function maybe_migrate_redirect_uri( array $settings ): array {
+		$old_redirect = (string) ( $settings['redirect_uri'] ?? '' );
+		$new_redirect = self::normalize_oauth_redirect_uri( $old_redirect );
+		if ( $new_redirect !== $old_redirect ) {
+			$settings['redirect_uri'] = $new_redirect;
+			self::update_option_no_autoload( self::OPTION_SETTINGS, $settings );
+			if ( class_exists( 'WCAS_Logger' ) ) {
+				WCAS_Logger::diagnostic(
+					'oauth',
+					'callback_endpoint_changed',
+					'success',
+					'Redirect URI OAuth migrado para o callback dedicado admin-post.php?action=wcas_oauth_callback.',
+					array(
+						'old_redirect_uri' => $old_redirect,
+						'new_redirect_uri' => $new_redirect,
+						'callback_type'    => 'admin_post',
+						'admin_post_action' => 'wcas_oauth_callback',
+					)
+				);
+			}
+		}
+		return $settings;
+	}
+
 	/**
 	 * Return all settings merged with defaults.
 	 *
@@ -64,6 +113,7 @@ class WCAS_Utils {
 	public static function get_settings(): array {
 		$settings = get_option( self::OPTION_SETTINGS, array() );
 		$settings = is_array( $settings ) ? $settings : array();
+		$settings = self::maybe_migrate_redirect_uri( $settings );
 		if ( ! empty( $settings['client_secret'] ) ) {
 			$settings['client_secret'] = self::decrypt_secret( (string) $settings['client_secret'] );
 		}
@@ -99,7 +149,7 @@ class WCAS_Utils {
 		$clean['client_id']    = sanitize_text_field( $input['client_id'] ?? '' );
 		$secret                = sanitize_text_field( $input['client_secret'] ?? '' );
 		$clean['client_secret'] = self::encrypt_secret( '' !== $secret ? $secret : (string) $current['client_secret'] );
-		$clean['redirect_uri']  = esc_url_raw( $input['redirect_uri'] ?? $current['redirect_uri'] );
+		$clean['redirect_uri']  = self::normalize_oauth_redirect_uri( esc_url_raw( $input['redirect_uri'] ?? $current['redirect_uri'] ) );
 		$clean['environment']   = in_array( $input['environment'] ?? 'production', array( 'production', 'development' ), true ) ? $input['environment'] : 'production';
 		$clean['api_base_url']  = self::sanitize_url_with_fallback( (string) ( $input['api_base_url'] ?? self::API_BASE_URL ), self::API_BASE_URL );
 		$clean['auth_url']      = self::sanitize_url_with_fallback( (string) ( $input['auth_url'] ?? self::AUTHORIZATION_URL ), self::AUTHORIZATION_URL );

@@ -20,11 +20,12 @@ class WCAS_Auth {
 	public function get_authorization_url(): string {
 		$state = wp_generate_password( 32, false, false );
 		set_transient( self::STATE_TRANSIENT_PREFIX . $state, get_current_user_id(), 10 * MINUTE_IN_SECONDS );
+		$redirect_uri = WCAS_Utils::normalize_oauth_redirect_uri( (string) WCAS_Utils::get_setting( 'redirect_uri' ) );
 
 		$args = array(
 			'response_type' => 'code',
 			'client_id'     => WCAS_Utils::get_setting( 'client_id' ),
-			'redirect_uri'  => WCAS_Utils::get_setting( 'redirect_uri' ),
+			'redirect_uri'  => $redirect_uri,
 			'state'         => $state,
 			'scope'         => 'openid profile aws.cognito.signin.user.admin',
 		);
@@ -37,7 +38,7 @@ class WCAS_Auth {
 			'URL de autorização OAuth2 gerada e state temporário criado.',
 			array(
 				'client_id'         => (string) WCAS_Utils::get_setting( 'client_id' ),
-				'redirect_uri'      => (string) WCAS_Utils::get_setting( 'redirect_uri' ),
+				'redirect_uri'      => $redirect_uri,
 				'authorization_url' => WCAS_Utils::redact_url_query( $url ),
 				'state_created'     => true,
 				'scope'             => $args['scope'],
@@ -49,7 +50,14 @@ class WCAS_Auth {
 
 
 	/**
-	 * Process OAuth callback request.
+	 * Dedicated admin-post OAuth callback endpoint.
+	 */
+	public function handle_admin_post_callback(): void {
+		$this->process_oauth_callback( 'admin_post' );
+	}
+
+	/**
+	 * Legacy callback support for older installations that still have admin.php configured.
 	 */
 	public function maybe_handle_callback(): void {
 		if ( ! is_admin() || ! isset( $_GET['page'] ) || 'wcas-conta-azul' !== sanitize_key( wp_unslash( $_GET['page'] ) ) ) {
@@ -63,6 +71,18 @@ class WCAS_Auth {
 			return;
 		}
 
+		WCAS_Logger::diagnostic( 'oauth', 'legacy_callback_received', 'warning', 'Callback OAuth recebido pelo endpoint legado admin.php?page=wcas-conta-azul; processe e atualize a Redirect URI para admin-post.php?action=wcas_oauth_callback.' );
+		$this->process_oauth_callback( 'legacy_admin_page' );
+	}
+
+	/**
+	 * Shared OAuth callback processor used by the dedicated endpoint and legacy compatibility path.
+	 */
+	private function process_oauth_callback( string $callback_type ): void {
+		$has_code  = isset( $_GET['code'] );
+		$has_state = isset( $_GET['state'] );
+		$has_error = isset( $_GET['error'] );
+
 		$received_code  = $has_code ? sanitize_text_field( wp_unslash( $_GET['code'] ) ) : '';
 		$received_state = $has_state ? sanitize_text_field( wp_unslash( $_GET['state'] ) ) : '';
 		$received_error = $has_error ? sanitize_text_field( wp_unslash( $_GET['error'] ) ) : '';
@@ -75,6 +95,7 @@ class WCAS_Auth {
 		WCAS_Utils::update_oauth_debug(
 			array(
 				'last_callback_at'       => current_time( 'mysql' ),
+				'last_callback_type'     => $callback_type,
 				'last_request_uri'       => $request_uri,
 				'last_state_received'    => WCAS_Utils::mask_identifier( $received_state ),
 				'last_code_received'     => WCAS_Utils::mask_identifier( $received_code ),
@@ -89,6 +110,7 @@ class WCAS_Auth {
 			'started',
 			'Callback OAuth2 recebido com REQUEST_URI, GET e POST capturados imediatamente.',
 			array(
+				'callback_type' => $callback_type,
 				'request_uri'   => $request_uri,
 				'get'           => is_array( $get_params ) ? $get_params : array(),
 				'post'          => is_array( $post_params ) ? $post_params : array(),
@@ -102,7 +124,7 @@ class WCAS_Auth {
 		);
 
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			WCAS_Logger::diagnostic( 'oauth', 'callback_capability', 'error', 'Callback OAuth2 bloqueado por falta de capability manage_woocommerce.' );
+			WCAS_Logger::diagnostic( 'oauth', 'callback_capability', 'error', 'Callback OAuth2 bloqueado por falta de capability manage_woocommerce.', array( 'callback_type' => $callback_type ) );
 			wp_die( esc_html__( 'Você não tem permissão para conectar a Conta Azul.', 'woocommerce-conta-azul-sync' ) );
 		}
 
@@ -113,6 +135,7 @@ class WCAS_Auth {
 				'error',
 				'OAuth callback retornou erro da Conta Azul.',
 				array(
+					'callback_type'     => $callback_type,
 					'error'             => $received_error,
 					'error_description' => $error_description,
 				)
@@ -122,7 +145,7 @@ class WCAS_Auth {
 		}
 
 		if ( ! $has_code || ! $has_state ) {
-			WCAS_Logger::diagnostic( 'oauth', 'callback_missing_parameters', 'error', 'Callback OAuth2 sem code ou state obrigatório.', array( 'code_present' => $has_code, 'state_present' => $has_state ) );
+			WCAS_Logger::diagnostic( 'oauth', 'callback_missing_parameters', 'error', 'Callback OAuth2 sem code ou state obrigatório.', array( 'callback_type' => $callback_type, 'code_present' => $has_code, 'state_present' => $has_state ) );
 			wp_safe_redirect( add_query_arg( array( 'page' => 'wcas-conta-azul', 'wcas_message' => 'auth_failed', 'tab' => 'logs' ), admin_url( 'admin.php' ) ) );
 			exit;
 		}
@@ -133,6 +156,7 @@ class WCAS_Auth {
 			'success',
 			'Authorization code recebido no callback OAuth2.',
 			array(
+				'callback_type' => $callback_type,
 				'code'          => $received_code,
 				'code_present'  => true,
 				'state_present' => true,
@@ -147,6 +171,7 @@ class WCAS_Auth {
 			$state_valid ? 'success' : 'error',
 			$state_valid ? 'State OAuth2 validado com sucesso.' : 'OAuth callback rejeitado por state inválido ou usuário divergente.',
 			array(
+				'callback_type'         => $callback_type,
 				'state_received'        => $received_state,
 				'state_stored'          => false !== $state_user_id ? 'exists' : 'missing',
 				'state_stored_user_id'  => false !== $state_user_id ? (int) $state_user_id : null,
@@ -167,7 +192,7 @@ class WCAS_Auth {
 		}
 		delete_transient( self::STATE_TRANSIENT_PREFIX . $received_state );
 
-		WCAS_Logger::diagnostic( 'oauth', 'token_exchange_started', 'started', 'Iniciando troca do authorization code por tokens OAuth2.', array( 'token_url' => (string) WCAS_Utils::get_setting( 'token_url', WCAS_Utils::TOKEN_URL ), 'method' => 'POST', 'code' => $received_code ) );
+		WCAS_Logger::diagnostic( 'oauth', 'token_exchange_started', 'started', 'Iniciando troca do authorization code por tokens OAuth2.', array( 'callback_type' => $callback_type, 'token_url' => (string) WCAS_Utils::get_setting( 'token_url', WCAS_Utils::TOKEN_URL ), 'method' => 'POST', 'code' => $received_code ) );
 		$result = $this->exchange_code( $received_code );
 		$message = is_wp_error( $result ) ? 'auth_failed' : 'auth_success';
 		wp_safe_redirect( add_query_arg( array( 'page' => 'wcas-conta-azul', 'wcas_message' => $message, 'tab' => 'logs' ), admin_url( 'admin.php' ) ) );

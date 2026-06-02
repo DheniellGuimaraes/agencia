@@ -67,8 +67,9 @@ O plugin deve ativar sem conexão OAuth. A conexão com Conta Azul só é exigid
 2. Crie uma conta de desenvolvedor ou faça login.
 3. Crie uma aplicação de **Desenvolvimento** ou **Produção**.
 4. Copie o `client_id` e o `client_secret`.
-5. Cadastre a **Redirect URI** exatamente igual à URL mostrada no plugin em **WooCommerce > Conta Azul**.
-6. Para desenvolvimento, use a conta teste disponibilizada pela Conta Azul quando aplicável.
+5. Cadastre a **Redirect URI** exatamente igual ao campo **URL para cadastrar na Conta Azul** mostrado no plugin em **WooCommerce > Conta Azul > Logs / Diagnóstico > OAuth Endpoints**.
+6. A URL deve usar o callback dedicado: `https://seu-dominio/wp-admin/admin-post.php?action=wcas_oauth_callback`. Não cadastre `wp-admin/admin.php?page=wcas-conta-azul` como callback OAuth.
+7. Para desenvolvimento, use a conta teste disponibilizada pela Conta Azul quando aplicável.
 
 ## Configuração no WordPress
 
@@ -77,7 +78,7 @@ Em **WooCommerce > Conta Azul**, preencha:
 - Ativar integração
 - Client ID
 - Client Secret
-- Redirect URI
+- Redirect URI, preenchida automaticamente pelo callback dedicado `admin-post.php?action=wcas_oauth_callback`
 - Ambiente
 - Sincronizar automaticamente pedidos
 - Sincronizar produtos
@@ -102,8 +103,8 @@ Fluxo implementado:
 1. O admin clica em **Conectar Conta Azul**.
 2. O plugin gera um `state` aleatório e temporário para proteção CSRF.
 3. O usuário é redirecionado para a Conta Azul.
-4. A Conta Azul retorna `code` e `state` para a Redirect URI.
-5. O plugin valida o `state` e troca o `code` por `access_token` e `refresh_token`.
+4. A Conta Azul retorna `code` e `state` para `wp-admin/admin-post.php?action=wcas_oauth_callback`.
+5. O hook `admin_post_wcas_oauth_callback` chama `WCAS_Auth::handle_admin_post_callback()`, valida o `state` e troca o `code` por `access_token` e `refresh_token`.
 6. O plugin renova o token automaticamente antes da expiração.
 7. Em HTTP 401, o client tenta renovar uma vez e reexecutar a chamada.
 
@@ -182,7 +183,7 @@ Dados sensíveis como tokens, secrets, autorização, senha, CPF/CNPJ, documento
 
 ### 3. Teste OAuth2
 
-- [ ] Cadastre a Redirect URI no Portal do Desenvolvedor.
+- [ ] Cadastre no Portal do Desenvolvedor a URL exibida em **URL para cadastrar na Conta Azul** (`wp-admin/admin-post.php?action=wcas_oauth_callback`).
 - [ ] Clique em **Conectar Conta Azul**.
 - [ ] Autorize com uma conta ERP válida.
 - [ ] Confirme retorno para o WordPress com status **Conectado**.
@@ -220,7 +221,7 @@ Dados sensíveis como tokens, secrets, autorização, senha, CPF/CNPJ, documento
 
 ### Redirect URI inválida
 
-A URL cadastrada no Portal do Desenvolvedor deve ser exatamente igual à URL exibida no plugin.
+A URL cadastrada no Portal do Desenvolvedor deve ser exatamente igual à **URL para cadastrar na Conta Azul** exibida no plugin e deve terminar em `wp-admin/admin-post.php?action=wcas_oauth_callback`.
 
 ### Falha ao obter token OAuth2
 
