@@ -121,6 +121,107 @@
 		phase.addEventListener('change', filterRows);
 	}
 
+
+	function stripInvisible(value) {
+		return String(value || '').replace(/[\u0000-\u001F\u007F\u00A0\u200B-\u200D\uFEFF]/g, '');
+	}
+
+	function safeDecode(value) {
+		try {
+			return decodeURIComponent(value);
+		} catch (error) {
+			return value;
+		}
+	}
+
+	function parseUri(value) {
+		try {
+			return new URL(value);
+		} catch (error) {
+			return null;
+		}
+	}
+
+	function compareRedirectUris(expected, portal) {
+		var differences = [];
+		var rawExpected = String(expected || '');
+		var rawPortal = String(portal || '');
+		var cleanExpected = stripInvisible(rawExpected).trim();
+		var cleanPortal = stripInvisible(rawPortal).trim();
+		var decodedExpected = safeDecode(cleanExpected);
+		var decodedPortal = safeDecode(cleanPortal);
+		var expectedUrl = parseUri(decodedExpected);
+		var portalUrl = parseUri(decodedPortal);
+
+		if (!rawPortal.trim()) {
+			differences.push('A Redirect URI cadastrada no Portal não foi informada.');
+			return differences;
+		}
+		if (rawExpected !== cleanExpected || rawPortal !== cleanPortal) {
+			differences.push('Caracteres invisíveis ou espaços extras detectados.');
+		}
+		if (cleanExpected !== decodedExpected || cleanPortal !== decodedPortal) {
+			differences.push('Encoding diferente: compare a versão decodificada e não cole a URL duplamente codificada.');
+		}
+		if (!expectedUrl || !portalUrl) {
+			differences.push('Uma das URIs não é uma URL absoluta válida.');
+			return differences;
+		}
+		if (expectedUrl.protocol !== portalUrl.protocol) {
+			differences.push('Protocolo diferente: plugin=' + expectedUrl.protocol + ' portal=' + portalUrl.protocol);
+		}
+		if (expectedUrl.hostname !== portalUrl.hostname) {
+			differences.push('Domínio diferente: plugin=' + expectedUrl.hostname + ' portal=' + portalUrl.hostname);
+		}
+		if (expectedUrl.hostname.replace(/^www\./i, '') === portalUrl.hostname.replace(/^www\./i, '') && expectedUrl.hostname !== portalUrl.hostname) {
+			differences.push('Diferença de www: um valor usa www e o outro não.');
+		}
+		if (expectedUrl.pathname !== portalUrl.pathname) {
+			differences.push('Caminho diferente: plugin=' + expectedUrl.pathname + ' portal=' + portalUrl.pathname);
+		}
+		if (expectedUrl.search !== portalUrl.search) {
+			differences.push('Query string diferente: plugin=' + (expectedUrl.search || '(vazia)') + ' portal=' + (portalUrl.search || '(vazia)'));
+		}
+		if (/\/$/.test(expectedUrl.pathname) !== /\/$/.test(portalUrl.pathname)) {
+			differences.push('Barra final diferente no caminho.');
+		}
+		if (decodedExpected.toLowerCase() === decodedPortal.toLowerCase() && decodedExpected !== decodedPortal) {
+			differences.push('Letras maiúsculas/minúsculas diferentes.');
+		}
+		if (decodedExpected !== decodedPortal && !differences.length) {
+			differences.push('As strings completas são diferentes, mesmo sem diferença estrutural identificada.');
+		}
+		return differences;
+	}
+
+	function initRedirectUriExactMatch() {
+		var box = qs('[data-wcas-redirect-match]');
+		if (!box) {
+			return;
+		}
+		var input = qs('[data-wcas-portal-uri]', box);
+		var button = qs('[data-wcas-compare-uris]', box);
+		var result = qs('[data-wcas-compare-result]', box);
+		var expected = box.getAttribute('data-sent-uri') || box.getAttribute('data-plugin-uri') || '';
+		if (!input || !button || !result) {
+			return;
+		}
+		button.addEventListener('click', function () {
+			var differences = compareRedirectUris(expected, input.value);
+			if (!differences.length) {
+				result.className = 'wcas-redirect-match__result wcas-redirect-match__result--match';
+				result.innerHTML = '<strong>MATCH ✅</strong><p>A Redirect URI cadastrada no Portal é exatamente igual à enviada para a Conta Azul.</p>';
+				return;
+			}
+			result.className = 'wcas-redirect-match__result wcas-redirect-match__result--mismatch';
+			result.innerHTML = '<strong>MISMATCH ❌</strong><p>Diferenças encontradas:</p><ul><li>' + differences.map(function (item) {
+				return item.replace(/[&<>"']/g, function (char) {
+					return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'}[char];
+				});
+			}).join('</li><li>') + '</li></ul>';
+		});
+	}
+
 	function initConnectionTest() {
 		var box = qs('[data-wcas-test-box]');
 		var button = qs('[data-wcas-run-test]');
@@ -163,6 +264,7 @@
 		initSecretField();
 		initLogFilters();
 		initOAuthTraceFilters();
+		initRedirectUriExactMatch();
 		initConnectionTest();
 	});
 }());

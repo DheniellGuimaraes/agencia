@@ -393,7 +393,11 @@ class WCAS_Admin {
 				<?php $this->checkbox_field( 'enabled', __( 'Ativar integração', 'woocommerce-conta-azul-sync' ), $settings, __( 'Habilita chamadas automáticas quando OAuth2 estiver conectado.', 'woocommerce-conta-azul-sync' ) ); ?>
 				<?php $this->text_field( 'client_id', __( 'Client ID', 'woocommerce-conta-azul-sync' ), $settings ); ?>
 				<?php $this->password_field( 'client_secret', __( 'Client Secret', 'woocommerce-conta-azul-sync' ), $settings ); ?>
-				<?php $this->url_field( 'redirect_uri', __( 'Redirect URI', 'woocommerce-conta-azul-sync' ), $settings, __( 'Use exatamente esta URL no Portal do Desenvolvedor.', 'woocommerce-conta-azul-sync' ) ); ?>
+				<div class="wcas-field wcas-field--readonly wcas-field--wide">
+					<span class="wcas-field__label"><?php esc_html_e( 'Redirect URI automática', 'woocommerce-conta-azul-sync' ); ?></span>
+					<code><?php echo esc_html( WCAS_Utils::get_oauth_callback_url() ); ?></code>
+					<small><?php esc_html_e( 'Copie exatamente esta URL e cadastre no Portal do Desenvolvedor da Conta Azul. Este valor não é editável para evitar redirect_mismatch.', 'woocommerce-conta-azul-sync' ); ?></small>
+				</div>
 				<?php $this->select_field( 'environment', __( 'Ambiente', 'woocommerce-conta-azul-sync' ), $settings, array( 'production' => __( 'Produção', 'woocommerce-conta-azul-sync' ), 'development' => __( 'Desenvolvimento / conta teste', 'woocommerce-conta-azul-sync' ) ), __( 'A documentação informa que não há sandbox dedicado; use conta teste quando aplicável.', 'woocommerce-conta-azul-sync' ) ); ?>
 				<div class="wcas-field wcas-field--readonly">
 					<span class="wcas-field__label"><?php esc_html_e( 'Status do token', 'woocommerce-conta-azul-sync' ); ?></span>
@@ -535,6 +539,64 @@ class WCAS_Admin {
 		<?php
 	}
 
+	/** Get the most recent OAuth trace entry by action. */
+	private function get_latest_oauth_trace_context( array $trace_entries, string $action ): array {
+		foreach ( $trace_entries as $entry ) {
+			if ( $action === (string) ( $entry['action'] ?? '' ) ) {
+				return isset( $entry['context'] ) && is_array( $entry['context'] ) ? $entry['context'] : array();
+			}
+		}
+		return array();
+	}
+
+	/** Render Redirect URI exact-match diagnostic card. */
+	private function render_redirect_uri_exact_match_card( array $trace_entries ): void {
+		$generated_context = $this->get_latest_oauth_trace_context( $trace_entries, 'generate_authorization_url' );
+		$redirect_context  = $this->get_latest_oauth_trace_context( $trace_entries, 'external_oauth_redirect_started' );
+		$callback_url      = WCAS_Utils::get_oauth_callback_url();
+		$sent_redirect    = (string) ( $generated_context['redirect_uri'] ?? '' );
+		if ( '' === $sent_redirect && isset( $generated_context['query_string_sent']['redirect_uri'] ) ) {
+			$sent_redirect = (string) $generated_context['query_string_sent']['redirect_uri'];
+		}
+		if ( '' === $sent_redirect ) {
+			$sent_redirect = $callback_url;
+		}
+		$oauth_url = (string) ( $generated_context['authorization_url'] ?? '' );
+		if ( '' === $oauth_url && ! empty( $redirect_context['authorization_url'] ) ) {
+			$oauth_url = (string) $redirect_context['authorization_url'];
+		}
+		if ( '' === $oauth_url && ! empty( $generated_context['url_complete'] ) ) {
+			$oauth_url = WCAS_Utils::redact_url_query( (string) $generated_context['url_complete'] );
+		}
+		$encoded_redirect = rawurlencode( $sent_redirect );
+		?>
+		<div class="wcas-redirect-match" data-wcas-redirect-match data-plugin-uri="<?php echo esc_attr( $callback_url ); ?>" data-sent-uri="<?php echo esc_attr( $sent_redirect ); ?>">
+			<div class="wcas-redirect-match__header">
+				<div>
+					<span class="wcas-eyebrow"><?php esc_html_e( 'Redirect URI Exact Match', 'woocommerce-conta-azul-sync' ); ?></span>
+					<strong><?php esc_html_e( 'Compare a URL cadastrada no Portal com a URL realmente enviada à Conta Azul', 'woocommerce-conta-azul-sync' ); ?></strong>
+					<p><?php esc_html_e( 'Copie exatamente esta URL e cadastre no Portal do Desenvolvedor da Conta Azul.', 'woocommerce-conta-azul-sync' ); ?></p>
+				</div>
+				<span class="wcas-badge wcas-is-warning"><?php esc_html_e( 'Anti redirect_mismatch', 'woocommerce-conta-azul-sync' ); ?></span>
+			</div>
+			<div class="wcas-redirect-match__grid">
+				<div><span><?php esc_html_e( 'URL OAuth completa gerada antes do redirect', 'woocommerce-conta-azul-sync' ); ?></span><code><?php echo esc_html( '' !== $oauth_url ? $oauth_url : __( 'Ainda não gerada. Clique em Conectar Conta Azul.', 'woocommerce-conta-azul-sync' ) ); ?></code></div>
+				<div><span><?php esc_html_e( 'redirect_uri enviada decodificada', 'woocommerce-conta-azul-sync' ); ?></span><code data-wcas-sent-uri><?php echo esc_html( $sent_redirect ); ?></code></div>
+				<div><span><?php esc_html_e( 'redirect_uri enviada codificada com rawurlencode', 'woocommerce-conta-azul-sync' ); ?></span><code><?php echo esc_html( $encoded_redirect ); ?></code></div>
+				<div><span><?php esc_html_e( 'URL para cadastrar no Portal da Conta Azul', 'woocommerce-conta-azul-sync' ); ?></span><code data-wcas-plugin-uri><?php echo esc_html( $callback_url ); ?></code></div>
+			</div>
+			<div class="wcas-redirect-match__manual">
+				<label for="wcas-portal-redirect-uri"><?php esc_html_e( 'Redirect URI cadastrada no Portal Conta Azul', 'woocommerce-conta-azul-sync' ); ?></label>
+				<textarea id="wcas-portal-redirect-uri" rows="3" data-wcas-portal-uri placeholder="https://seudominio.com/wp-admin/admin-post.php?action=wcas_oauth_callback"></textarea>
+				<button type="button" class="button wcas-button wcas-button--primary" data-wcas-compare-uris><?php esc_html_e( 'Comparar URIs', 'woocommerce-conta-azul-sync' ); ?></button>
+			</div>
+			<div class="wcas-redirect-match__result" data-wcas-compare-result aria-live="polite">
+				<?php esc_html_e( 'Cole a URI cadastrada no Portal e clique em Comparar URIs.', 'woocommerce-conta-azul-sync' ); ?>
+			</div>
+		</div>
+		<?php
+	}
+
 	/** Render OAuth full trace panel. */
 	private function render_oauth_trace_panel(): void {
 		$trace_entries = WCAS_Logger::get_oauth_trace( 500 );
@@ -549,6 +611,8 @@ class WCAS_Admin {
 				</div>
 				<span class="wcas-badge wcas-is-muted"><?php echo esc_html( sprintf( __( '%d eventos', 'woocommerce-conta-azul-sync' ), count( $trace_entries ) ) ); ?></span>
 			</div>
+
+			<?php $this->render_redirect_uri_exact_match_card( $trace_entries ); ?>
 
 			<div class="wcas-log-filters" role="search" aria-label="<?php esc_attr_e( 'Filtros do OAuth Full Trace', 'woocommerce-conta-azul-sync' ); ?>">
 				<label for="wcas-oauth-trace-search"><?php esc_html_e( 'Buscar', 'woocommerce-conta-azul-sync' ); ?></label>

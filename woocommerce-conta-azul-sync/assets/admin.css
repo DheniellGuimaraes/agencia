@@ -879,3 +879,128 @@
 		font-size: 0.72rem;
 	}
 }
+
+.wcas-field--wide {
+	grid-column: 1 / -1;
+}
+
+.wcas-redirect-match {
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(239, 246, 255, 0.7));
+	border: 1px solid rgba(59, 130, 246, 0.18);
+	border-radius: 22px;
+	box-shadow: 0 24px 70px rgba(37, 99, 235, 0.1);
+	margin: 18px 0 22px;
+	padding: 18px;
+}
+
+.wcas-redirect-match__header {
+	align-items: flex-start;
+	display: flex;
+	gap: 16px;
+	justify-content: space-between;
+	margin-bottom: 16px;
+}
+
+.wcas-redirect-match__header strong {
+	color: var(--wcas-ink);
+	display: block;
+	font-size: 1.05rem;
+	margin-top: 4px;
+}
+
+.wcas-redirect-match__header p {
+	color: var(--wcas-muted);
+	margin: 6px 0 0;
+}
+
+.wcas-redirect-match__grid {
+	display: grid;
+	gap: 12px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.wcas-redirect-match__grid div,
+.wcas-redirect-match__manual,
+.wcas-redirect-match__result {
+	background: rgba(255, 255, 255, 0.72);
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	border-radius: 16px;
+	padding: 13px;
+}
+
+.wcas-redirect-match span,
+.wcas-redirect-match label {
+	color: var(--wcas-muted);
+	display: block;
+	font-size: 0.72rem;
+	font-weight: 850;
+	letter-spacing: 0.04em;
+	margin-bottom: 7px;
+	text-transform: uppercase;
+}
+
+.wcas-redirect-match code {
+	background: transparent;
+	color: var(--wcas-ink);
+	display: block;
+	font-size: 0.82rem;
+	overflow-wrap: anywhere;
+	padding: 0;
+	white-space: normal;
+}
+
+.wcas-redirect-match__manual {
+	align-items: flex-end;
+	display: grid;
+	gap: 12px;
+	grid-template-columns: minmax(0, 1fr) auto;
+	margin-top: 12px;
+}
+
+.wcas-redirect-match__manual label {
+	grid-column: 1 / -1;
+}
+
+.wcas-redirect-match__manual textarea {
+	border-radius: 12px;
+	min-height: 76px;
+	resize: vertical;
+	width: 100%;
+}
+
+.wcas-redirect-match__result {
+	margin-top: 12px;
+}
+
+.wcas-redirect-match__result strong {
+	display: block;
+	font-size: 1rem;
+	margin-bottom: 6px;
+}
+
+.wcas-redirect-match__result--match {
+	background: rgba(220, 252, 231, 0.86);
+	border-color: rgba(34, 197, 94, 0.32);
+	color: #166534;
+}
+
+.wcas-redirect-match__result--mismatch {
+	background: rgba(254, 242, 242, 0.9);
+	border-color: rgba(239, 68, 68, 0.36);
+	color: #991b1b;
+}
+
+.wcas-redirect-match__result ul {
+	margin: 8px 0 0 18px;
+}
+
+@media (max-width: 900px) {
+	.wcas-redirect-match__grid,
+	.wcas-redirect-match__manual {
+		grid-template-columns: 1fr;
+	}
+
+	.wcas-redirect-match__header {
+		flex-direction: column;
+	}
+}

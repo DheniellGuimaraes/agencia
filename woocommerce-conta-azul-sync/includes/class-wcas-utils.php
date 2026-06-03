@@ -68,11 +68,10 @@ class WCAS_Utils {
 	 * Normalize legacy callbacks to the dedicated admin-post OAuth callback.
 	 */
 	public static function normalize_oauth_redirect_uri( string $redirect_uri ): string {
-		$redirect_uri = esc_url_raw( trim( $redirect_uri ) );
-		if ( '' === $redirect_uri || false !== strpos( $redirect_uri, 'admin.php?page=wcas-conta-azul' ) || false !== strpos( $redirect_uri, '/wp-json/wcas/v1/oauth/callback' ) ) {
-			return self::get_oauth_callback_url();
-		}
-		return $redirect_uri;
+		// The OAuth Redirect URI is intentionally not user-editable. Always generate it
+		// from WordPress so the value used in authorization and token exchange matches
+		// the URL displayed for registration in Conta Azul.
+		return self::get_oauth_callback_url();
 	}
 
 	/**
@@ -149,7 +148,7 @@ class WCAS_Utils {
 		$clean['client_id']    = sanitize_text_field( $input['client_id'] ?? '' );
 		$secret                = sanitize_text_field( $input['client_secret'] ?? '' );
 		$clean['client_secret'] = self::encrypt_secret( '' !== $secret ? $secret : (string) $current['client_secret'] );
-		$clean['redirect_uri']  = self::normalize_oauth_redirect_uri( esc_url_raw( $input['redirect_uri'] ?? $current['redirect_uri'] ) );
+		$clean['redirect_uri']  = self::get_oauth_callback_url();
 		$clean['environment']   = in_array( $input['environment'] ?? 'production', array( 'production', 'development' ), true ) ? $input['environment'] : 'production';
 		$clean['api_base_url']  = self::sanitize_url_with_fallback( (string) ( $input['api_base_url'] ?? self::API_BASE_URL ), self::API_BASE_URL );
 		$clean['auth_url']      = self::sanitize_url_with_fallback( (string) ( $input['auth_url'] ?? self::AUTHORIZATION_URL ), self::AUTHORIZATION_URL );
