@@ -12,6 +12,8 @@ defined( 'ABSPATH' ) || exit;
  */
 class WCAS_Logger {
 	public const TABLE = 'wcas_logs';
+	private const OAUTH_TRACE_FILE = 'logs/oauth-full-trace.log';
+	private const OAUTH_TRACE_MAX_ENTRIES = 500;
 
 	/**
 	 * Create custom log table.
@@ -97,6 +99,122 @@ class WCAS_Logger {
 	}
 
 	/**
+	 * Record an OAuth full-trace event in the DB logger and in logs/oauth-full-trace.log.
+	 *
+	 * @param string               $action Action/event name.
+	 * @param string               $phase Trace phase: sent, received, error, token, system.
+	 * @param string               $result Result label.
+	 * @param string               $message Technical message.
+	 * @param array<string, mixed> $context Safe diagnostic context.
+	 * @param int|null             $http_status Optional HTTP status.
+	 */
+	public static function oauth_trace( string $action, string $phase, string $result, string $message, array $context = array(), ?int $http_status = null ): void {
+		$context = array_merge( array( 'trace_phase' => sanitize_key( $phase ) ), $context );
+		self::diagnostic( 'oauth', $action, $result, $message, $context, $http_status );
+		self::append_oauth_trace_file(
+			array(
+				'timestamp'   => current_time( 'mysql' ),
+				'type'        => 'oauth',
+				'phase'       => sanitize_key( $phase ),
+				'action'      => $action,
+				'result'      => $result,
+				'message'     => $message,
+				'http_status' => $http_status,
+				'context'     => $context,
+			)
+		);
+	}
+
+	/**
+	 * Fetch OAuth full trace entries from the file log.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function get_oauth_trace( int $limit = 500 ): array {
+		$file = self::oauth_trace_path();
+		if ( ! file_exists( $file ) || ! is_readable( $file ) ) {
+			return array();
+		}
+		$lines = file( $file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES );
+		if ( ! is_array( $lines ) ) {
+			return array();
+		}
+		$lines = array_slice( $lines, -1 * max( 1, min( self::OAUTH_TRACE_MAX_ENTRIES, $limit ) ) );
+		$entries = array();
+		foreach ( array_reverse( $lines ) as $line ) {
+			$decoded = json_decode( $line, true );
+			if ( is_array( $decoded ) ) {
+				$entries[] = $decoded;
+			}
+		}
+		return $entries;
+	}
+
+	/**
+	 * Remove OAuth full-trace file contents.
+	 */
+	public static function clear_oauth_trace(): void {
+		$file = self::oauth_trace_path();
+		if ( ! self::ensure_oauth_trace_directory() || ( file_exists( $file ) && ! is_writable( $file ) ) ) {
+			return;
+		}
+		file_put_contents( $file, '' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+	}
+
+	/**
+	 * Append and rotate the OAuth trace file.
+	 *
+	 * @param array<string, mixed> $entry Entry data.
+	 */
+	private static function append_oauth_trace_file( array $entry ): void {
+		if ( ! self::ensure_oauth_trace_directory() ) {
+			return;
+		}
+		$file = self::oauth_trace_path();
+		if ( file_exists( $file ) && ! is_writable( $file ) ) {
+			return;
+		}
+		$entry = WCAS_Utils::mask_sensitive( $entry );
+		$line = wp_json_encode( $entry );
+		if ( ! is_string( $line ) ) {
+			return;
+		}
+		$lines = file_exists( $file ) ? file( $file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES ) : array();
+		$lines = is_array( $lines ) ? array_slice( $lines, -1 * ( self::OAUTH_TRACE_MAX_ENTRIES - 1 ) ) : array();
+		$lines[] = $line;
+		file_put_contents( $file, implode( PHP_EOL, $lines ) . PHP_EOL, LOCK_EX ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+	}
+
+	/**
+	 * OAuth trace file path.
+	 */
+	private static function oauth_trace_path(): string {
+		return trailingslashit( WCAS_PLUGIN_DIR ) . self::OAUTH_TRACE_FILE;
+	}
+
+	/**
+	 * Ensure log directory exists and is not directly browsable on Apache.
+	 */
+	private static function ensure_oauth_trace_directory(): bool {
+		$directory = dirname( self::oauth_trace_path() );
+		if ( ! is_dir( $directory ) ) {
+			wp_mkdir_p( $directory );
+		}
+		if ( ! is_dir( $directory ) || ! is_writable( $directory ) ) {
+			return false;
+		}
+		$htaccess = trailingslashit( $directory ) . '.htaccess';
+		$index = trailingslashit( $directory ) . 'index.php';
+		if ( ! file_exists( $htaccess ) ) {
+			file_put_contents( $htaccess, "Deny from all\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		}
+		if ( ! file_exists( $index ) ) {
+			file_put_contents( $index, "<?php\n// Silence is golden.\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		}
+		return true;
+	}
+
+	/**
 	 * Fetch latest logs.
 	 *
 	 * @return array<int, object>
@@ -113,5 +231,6 @@ class WCAS_Logger {
 	public static function clear(): void {
 		global $wpdb;
 		$wpdb->query( 'TRUNCATE TABLE ' . self::table_name() ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		self::clear_oauth_trace();
 	}
 }

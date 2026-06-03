@@ -237,7 +237,37 @@ class WCAS_Utils {
 			}
 			return $masked;
 		}
+		if ( is_string( $value ) ) {
+			return self::redact_sensitive_text( $value );
+		}
 		return $value;
+	}
+
+	/**
+	 * Redact sensitive tokens/secrets from arbitrary strings such as raw HTTP bodies.
+	 */
+	public static function redact_sensitive_text( string $value ): string {
+		$patterns = array(
+			'/(access_token|refresh_token|client_secret|id_token)([\"\']?\s*[:=]\s*[\"\']?)([^\"\'&\s,}]+)/i',
+			'/(Authorization\s*[:=]\s*)(Bearer|Basic)\s+[^\s,}]+/i',
+		);
+		$replacements = array( '$1$2***', '$1$2 ***' );
+		return preg_replace( $patterns, $replacements, $value ) ?? $value;
+	}
+
+	/**
+	 * Return a query-string map from a URL for diagnostics. Values are masked later.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function get_url_query_args( string $url ): array {
+		$parts = wp_parse_url( $url );
+		if ( ! is_array( $parts ) || empty( $parts['query'] ) ) {
+			return array();
+		}
+		$query = array();
+		wp_parse_str( (string) $parts['query'], $query );
+		return is_array( $query ) ? $query : array();
 	}
 
 

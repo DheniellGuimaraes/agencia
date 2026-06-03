@@ -42,8 +42,9 @@
 		if (window.location.hash && window.location.hash.indexOf('#wcas-panel-') === 0) {
 			initial = window.location.hash.replace('#wcas-panel-', '');
 		}
-		if (new URLSearchParams(window.location.search).get('tab') === 'logs') {
-			initial = 'logs';
+		var tabParam = new URLSearchParams(window.location.search).get('tab');
+		if (tabParam) {
+			initial = tabParam;
 		}
 		activateTab(initial);
 	}
@@ -88,6 +89,38 @@
 		type.addEventListener('change', filterRows);
 	}
 
+
+	function initOAuthTraceFilters() {
+		var search = qs('#wcas-oauth-trace-search');
+		var phase = qs('#wcas-oauth-trace-phase');
+		var rows = qsa('[data-wcas-oauth-trace-row]');
+		var empty = qs('.wcas-empty-state--trace-filtered');
+		if (!rows.length || !search || !phase) {
+			return;
+		}
+
+		function filterRows() {
+			var term = search.value.trim().toLowerCase();
+			var selectedPhase = phase.value;
+			var visible = 0;
+			rows.forEach(function (row) {
+				var matchesTerm = !term || row.textContent.toLowerCase().indexOf(term) !== -1;
+				var matchesPhase = !selectedPhase || row.getAttribute('data-wcas-phase') === selectedPhase;
+				var show = matchesTerm && matchesPhase;
+				row.hidden = !show;
+				if (show) {
+					visible += 1;
+				}
+			});
+			if (empty) {
+				empty.hidden = visible !== 0;
+			}
+		}
+
+		search.addEventListener('input', filterRows);
+		phase.addEventListener('change', filterRows);
+	}
+
 	function initConnectionTest() {
 		var box = qs('[data-wcas-test-box]');
 		var button = qs('[data-wcas-run-test]');
@@ -129,6 +162,7 @@
 		initTabs();
 		initSecretField();
 		initLogFilters();
+		initOAuthTraceFilters();
 		initConnectionTest();
 	});
 }());

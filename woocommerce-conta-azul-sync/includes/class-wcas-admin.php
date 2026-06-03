@@ -89,16 +89,24 @@ class WCAS_Admin {
 	public function connect(): void {
 		$this->verify_action();
 		$settings = WCAS_Utils::get_settings();
-		WCAS_Logger::diagnostic(
-			'oauth',
+		WCAS_Logger::oauth_trace(
 			'connect_button_clicked',
+			'sent',
 			'started',
 			'Botão Conectar Conta Azul acionado; nonce e capability aprovados.',
-			$this->build_oauth_diagnostic_context( $settings )
+			array_merge(
+				$this->build_oauth_diagnostic_context( $settings ),
+				array(
+					'timestamp'             => current_time( 'mysql' ),
+					'http_method'           => 'POST',
+					'nonce_validation'      => 'passed',
+					'capability_validation' => 'passed',
+				)
+			)
 		);
 
 		if ( '' === (string) $settings['client_id'] || '' === (string) $settings['client_secret'] ) {
-			WCAS_Logger::diagnostic( 'oauth', 'connect_precheck', 'error', 'Client ID ou Client Secret ausente antes do redirect OAuth2.', $this->build_oauth_diagnostic_context( $settings ) );
+			WCAS_Logger::oauth_trace( 'connect_precheck', 'error', 'error', 'Client ID ou Client Secret ausente antes do redirect OAuth2.', $this->build_oauth_diagnostic_context( $settings ) );
 			$this->redirect( 'missing_credentials', 'logs' );
 		}
 
@@ -108,9 +116,9 @@ class WCAS_Admin {
 			$redirect_allowed  = str_starts_with( $authorization_url, 'https://auth.contaazul.com/' );
 
 			if ( ! $redirect_allowed ) {
-				WCAS_Logger::diagnostic(
-					'oauth',
+				WCAS_Logger::oauth_trace(
 					'invalid_oauth_redirect_host',
+					'error',
 					'error',
 					'Redirect OAuth externo bloqueado porque a URL não pertence ao host oficial auth.contaazul.com.',
 					array(
@@ -123,14 +131,18 @@ class WCAS_Admin {
 				$this->redirect( 'auth_failed', 'logs' );
 			}
 
-			WCAS_Logger::diagnostic(
-				'oauth',
+			WCAS_Logger::oauth_trace(
 				'external_oauth_redirect_started',
+				'sent',
 				'success',
 				'Redirect externo OAuth para Conta Azul iniciado com wp_redirect.',
 				array(
-					'authorization_url' => WCAS_Utils::redact_url_query( $authorization_url ),
-					'redirect_method'   => 'wp_redirect',
+					'url_complete'        => $authorization_url,
+					'authorization_url'   => WCAS_Utils::redact_url_query( $authorization_url ),
+					'query_string_sent'   => WCAS_Utils::get_url_query_args( $authorization_url ),
+					'headers_sent_to_ca'  => array( 'Location' => $authorization_url, 'Status' => '302 Found', 'Client-Secret' => 'not_sent' ),
+					'timestamp'           => current_time( 'mysql' ),
+					'redirect_method'     => 'wp_redirect',
 					'redirect_host'     => $redirect_host,
 					'redirect_allowed'  => true,
 				)
@@ -138,7 +150,7 @@ class WCAS_Admin {
 			wp_redirect( $authorization_url ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
 			exit;
 		} catch ( Throwable $throwable ) {
-			WCAS_Logger::diagnostic( 'oauth', 'connect_redirect', 'error', 'Erro antes do redirect OAuth2: ' . $throwable->getMessage(), $this->build_oauth_diagnostic_context( $settings ) );
+			WCAS_Logger::oauth_trace( 'connect_redirect', 'error', 'error', 'Erro antes do redirect OAuth2: ' . $throwable->getMessage(), $this->build_oauth_diagnostic_context( $settings ) );
 			$this->redirect( 'auth_failed', 'logs' );
 		}
 	}
@@ -279,6 +291,7 @@ class WCAS_Admin {
 			<?php $this->render_oauth_action_forms(); ?>
 
 			<?php $this->render_logs_panel( $logs ); ?>
+			<?php $this->render_oauth_trace_panel(); ?>
 			<?php $this->render_tests_panel( $settings, $metrics ); ?>
 			<?php $this->render_help_panel(); ?>
 		</div>
@@ -296,6 +309,7 @@ class WCAS_Admin {
 			'sync'       => __( 'Sincronização', 'woocommerce-conta-azul-sync' ),
 			'endpoints'  => __( 'Endpoints', 'woocommerce-conta-azul-sync' ),
 			'logs'       => __( 'Logs / Diagnóstico', 'woocommerce-conta-azul-sync' ),
+			'oauth-trace'=> __( 'OAuth Full Trace', 'woocommerce-conta-azul-sync' ),
 			'tests'      => __( 'Testes', 'woocommerce-conta-azul-sync' ),
 			'help'       => __( 'Ajuda', 'woocommerce-conta-azul-sync' ),
 		);
@@ -515,6 +529,68 @@ class WCAS_Admin {
 				<div class="wcas-empty-state wcas-empty-state--filtered" hidden>
 					<strong><?php esc_html_e( 'Nenhum log encontrado', 'woocommerce-conta-azul-sync' ); ?></strong>
 					<p><?php esc_html_e( 'Ajuste os filtros para visualizar outros registros.', 'woocommerce-conta-azul-sync' ); ?></p>
+				</div>
+			<?php endif; ?>
+		</section>
+		<?php
+	}
+
+	/** Render OAuth full trace panel. */
+	private function render_oauth_trace_panel(): void {
+		$trace_entries = WCAS_Logger::get_oauth_trace( 500 );
+		$phases = array( 'sent' => __( 'Enviado', 'woocommerce-conta-azul-sync' ), 'received' => __( 'Recebido', 'woocommerce-conta-azul-sync' ), 'error' => __( 'Erro', 'woocommerce-conta-azul-sync' ), 'token' => __( 'Token', 'woocommerce-conta-azul-sync' ) );
+		?>
+		<section class="wcas-panel wcas-card" id="wcas-panel-oauth-trace" data-wcas-panel="oauth-trace" aria-labelledby="wcas-oauth-trace-title">
+			<div class="wcas-card__header">
+				<div>
+					<span class="wcas-eyebrow"><?php esc_html_e( 'OAuth Full Trace', 'woocommerce-conta-azul-sync' ); ?></span>
+					<h2 id="wcas-oauth-trace-title"><?php esc_html_e( 'Rastreamento linha por linha do OAuth2', 'woocommerce-conta-azul-sync' ); ?></h2>
+					<p><?php esc_html_e( 'Mostra URL enviada, query strings, callback acionado, resposta da Conta Azul, token endpoint e erros como redirect_mismatch com dados sensíveis mascarados.', 'woocommerce-conta-azul-sync' ); ?></p>
+				</div>
+				<span class="wcas-badge wcas-is-muted"><?php echo esc_html( sprintf( __( '%d eventos', 'woocommerce-conta-azul-sync' ), count( $trace_entries ) ) ); ?></span>
+			</div>
+
+			<div class="wcas-log-filters" role="search" aria-label="<?php esc_attr_e( 'Filtros do OAuth Full Trace', 'woocommerce-conta-azul-sync' ); ?>">
+				<label for="wcas-oauth-trace-search"><?php esc_html_e( 'Buscar', 'woocommerce-conta-azul-sync' ); ?></label>
+				<input id="wcas-oauth-trace-search" type="search" class="wcas-log-search" placeholder="<?php esc_attr_e( 'redirect_uri, action, erro, callback...', 'woocommerce-conta-azul-sync' ); ?>" />
+				<label for="wcas-oauth-trace-phase"><?php esc_html_e( 'Evento', 'woocommerce-conta-azul-sync' ); ?></label>
+				<select id="wcas-oauth-trace-phase" class="wcas-log-type">
+					<option value=""><?php esc_html_e( 'Todos', 'woocommerce-conta-azul-sync' ); ?></option>
+					<?php foreach ( $phases as $phase => $label ) : ?>
+						<option value="<?php echo esc_attr( $phase ); ?>"><?php echo esc_html( $label ); ?></option>
+					<?php endforeach; ?>
+				</select>
+			</div>
+
+			<?php if ( empty( $trace_entries ) ) : ?>
+				<div class="wcas-empty-state">
+					<strong><?php esc_html_e( 'Nenhum trace OAuth ainda', 'woocommerce-conta-azul-sync' ); ?></strong>
+					<p><?php esc_html_e( 'Clique em Conectar Conta Azul para registrar a URL enviada, o callback recebido e a troca de token.', 'woocommerce-conta-azul-sync' ); ?></p>
+				</div>
+			<?php else : ?>
+				<div class="wcas-oauth-trace-list" aria-live="polite">
+					<?php foreach ( $trace_entries as $entry ) : ?>
+						<?php
+						$context = isset( $entry['context'] ) && is_array( $entry['context'] ) ? $entry['context'] : array();
+						$phase = sanitize_key( (string) ( $entry['phase'] ?? 'system' ) );
+						$is_error = 'error' === $phase || false !== stripos( (string) ( $entry['message'] ?? '' ), 'redirect_mismatch' ) || false !== stripos( WCAS_Utils::summarize( $context, 1000 ), 'redirect_mismatch' );
+						?>
+						<article class="wcas-oauth-trace-row <?php echo $is_error ? 'wcas-oauth-trace-row--error' : ''; ?>" data-wcas-oauth-trace-row data-wcas-phase="<?php echo esc_attr( $phase ); ?>">
+							<div class="wcas-oauth-trace-row__meta">
+								<span><?php echo esc_html( (string) ( $entry['timestamp'] ?? '' ) ); ?></span>
+								<span class="wcas-result-chip <?php echo esc_attr( $this->get_result_class( (string) ( $entry['result'] ?? '' ) ) ); ?>"><?php echo esc_html( (string) ( $entry['result'] ?? '-' ) ); ?></span>
+								<span class="wcas-log-chip wcas-oauth-trace-phase--<?php echo esc_attr( $phase ); ?>"><?php echo esc_html( $phases[ $phase ] ?? $phase ); ?></span>
+								<?php if ( ! empty( $entry['http_status'] ) ) : ?><span>HTTP <?php echo esc_html( (string) $entry['http_status'] ); ?></span><?php endif; ?>
+							</div>
+							<strong><?php echo esc_html( (string) ( $entry['action'] ?? '-' ) ); ?></strong>
+							<p><?php echo esc_html( (string) ( $entry['message'] ?? '' ) ); ?></p>
+							<pre><?php echo esc_html( wp_json_encode( WCAS_Utils::mask_sensitive( $context ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) ); ?></pre>
+						</article>
+					<?php endforeach; ?>
+				</div>
+				<div class="wcas-empty-state wcas-empty-state--trace-filtered" hidden>
+					<strong><?php esc_html_e( 'Nenhum evento OAuth encontrado', 'woocommerce-conta-azul-sync' ); ?></strong>
+					<p><?php esc_html_e( 'Ajuste o filtro para ver outros eventos do fluxo.', 'woocommerce-conta-azul-sync' ); ?></p>
 				</div>
 			<?php endif; ?>
 		</section>

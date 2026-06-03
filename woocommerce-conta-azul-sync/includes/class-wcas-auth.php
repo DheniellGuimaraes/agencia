@@ -31,17 +31,24 @@ class WCAS_Auth {
 		);
 
 		$url = add_query_arg( $args, (string) WCAS_Utils::get_setting( 'auth_url', WCAS_Utils::AUTHORIZATION_URL ) );
-		WCAS_Logger::diagnostic(
-			'oauth',
+		WCAS_Logger::oauth_trace(
 			'generate_authorization_url',
+			'sent',
 			'success',
 			'URL de autorização OAuth2 gerada e state temporário criado.',
 			array(
-				'client_id'         => (string) WCAS_Utils::get_setting( 'client_id' ),
-				'redirect_uri'      => $redirect_uri,
-				'authorization_url' => WCAS_Utils::redact_url_query( $url ),
-				'state_created'     => true,
-				'scope'             => $args['scope'],
+				'timestamp'           => current_time( 'mysql' ),
+				'url_complete'        => $url,
+				'authorization_url'   => WCAS_Utils::redact_url_query( $url ),
+				'query_string_sent'   => $args,
+				'client_id'           => (string) WCAS_Utils::get_setting( 'client_id' ),
+				'redirect_uri'        => $redirect_uri,
+				'response_type'       => $args['response_type'],
+				'state'               => $state,
+				'scope'               => $args['scope'],
+				'state_created'       => true,
+				'http_method'         => 'GET',
+				'headers_sent_to_ca'  => array( 'Client-Secret' => 'not_sent', 'Authorization' => 'not_sent' ),
 			)
 		);
 
@@ -71,7 +78,7 @@ class WCAS_Auth {
 			return;
 		}
 
-		WCAS_Logger::diagnostic( 'oauth', 'legacy_callback_received', 'warning', 'Callback OAuth recebido pelo endpoint legado admin.php?page=wcas-conta-azul; processe e atualize a Redirect URI para admin-post.php?action=wcas_oauth_callback.' );
+		WCAS_Logger::oauth_trace( 'legacy_callback_received', 'received', 'warning', 'Callback OAuth recebido pelo endpoint legado admin.php?page=wcas-conta-azul; processe e atualize a Redirect URI para admin-post.php?action=wcas_oauth_callback.' );
 		$this->process_oauth_callback( 'legacy_admin_page' );
 	}
 
@@ -89,8 +96,11 @@ class WCAS_Auth {
 		$error_description = isset( $_GET['error_description'] ) ? sanitize_text_field( wp_unslash( $_GET['error_description'] ) ) : '';
 
 		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : 'GET';
 		$get_params  = wp_unslash( $_GET ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$post_params = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$raw_body = file_get_contents( 'php://input' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$raw_body = is_string( $raw_body ) ? $raw_body : '';
 
 		WCAS_Utils::update_oauth_debug(
 			array(
@@ -104,34 +114,44 @@ class WCAS_Auth {
 			)
 		);
 
-		WCAS_Logger::diagnostic(
-			'oauth',
+		WCAS_Logger::oauth_trace(
 			'callback_received',
+			$has_error ? 'error' : 'received',
 			'started',
-			'Callback OAuth2 recebido com REQUEST_URI, GET e POST capturados imediatamente.',
+			'Callback OAuth2 recebido com REQUEST_URI, GET, POST e body capturados imediatamente.',
 			array(
-				'callback_type' => $callback_type,
-				'request_uri'   => $request_uri,
-				'get'           => is_array( $get_params ) ? $get_params : array(),
-				'post'          => is_array( $post_params ) ? $post_params : array(),
-				'code_present'  => $has_code,
-				'state_present' => $has_state,
-				'error_present' => $has_error,
-				'code'          => $received_code,
-				'state'         => $received_state,
-				'error'         => $received_error,
+				'timestamp'             => current_time( 'mysql' ),
+				'callback_type'         => $callback_type,
+				'callback_triggered'    => $callback_type,
+				'return_url'            => $request_uri,
+				'url_return'            => $request_uri,
+				'http_method'           => $request_method,
+				'http_status'           => null,
+				'query_string_received' => is_array( $get_params ) ? $get_params : array(),
+				'get'                   => is_array( $get_params ) ? $get_params : array(),
+				'post'                  => is_array( $post_params ) ? $post_params : array(),
+				'body_complete'         => $raw_body,
+				'code_present'          => $has_code,
+				'state_present'         => $has_state,
+				'error_present'         => $has_error,
+				'code'                  => $received_code,
+				'state'                 => $received_state,
+				'error'                 => $received_error,
+				'error_description'     => $error_description,
+				'nonce_validation'      => 'not_applicable_oauth_state_used',
 			)
 		);
 
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			WCAS_Logger::diagnostic( 'oauth', 'callback_capability', 'error', 'Callback OAuth2 bloqueado por falta de capability manage_woocommerce.', array( 'callback_type' => $callback_type ) );
+			WCAS_Logger::oauth_trace( 'callback_capability', 'error', 'error', 'Callback OAuth2 bloqueado por falta de capability manage_woocommerce.', array( 'callback_type' => $callback_type, 'capability_validation' => 'failed', 'nonce_validation' => 'not_applicable_oauth_state_used' ) );
 			wp_die( esc_html__( 'Você não tem permissão para conectar a Conta Azul.', 'woocommerce-conta-azul-sync' ) );
 		}
+		WCAS_Logger::oauth_trace( 'callback_capability', 'received', 'success', 'Capability manage_woocommerce validada no callback OAuth2.', array( 'callback_type' => $callback_type, 'capability_validation' => 'passed', 'nonce_validation' => 'not_applicable_oauth_state_used' ) );
 
 		if ( $has_error ) {
-			WCAS_Logger::diagnostic(
-				'oauth',
+			WCAS_Logger::oauth_trace(
 				'callback_error',
+				'error',
 				'error',
 				'OAuth callback retornou erro da Conta Azul.',
 				array(
@@ -145,14 +165,14 @@ class WCAS_Auth {
 		}
 
 		if ( ! $has_code || ! $has_state ) {
-			WCAS_Logger::diagnostic( 'oauth', 'callback_missing_parameters', 'error', 'Callback OAuth2 sem code ou state obrigatório.', array( 'callback_type' => $callback_type, 'code_present' => $has_code, 'state_present' => $has_state ) );
+			WCAS_Logger::oauth_trace( 'callback_missing_parameters', 'error', 'error', 'Callback OAuth2 sem code ou state obrigatório.', array( 'callback_type' => $callback_type, 'code_present' => $has_code, 'state_present' => $has_state, 'required_parameters' => array( 'code', 'state' ) ) );
 			wp_safe_redirect( add_query_arg( array( 'page' => 'wcas-conta-azul', 'wcas_message' => 'auth_failed', 'tab' => 'logs' ), admin_url( 'admin.php' ) ) );
 			exit;
 		}
 
-		WCAS_Logger::diagnostic(
-			'oauth',
+		WCAS_Logger::oauth_trace(
 			'authorization_code_received',
+			'received',
 			'success',
 			'Authorization code recebido no callback OAuth2.',
 			array(
@@ -165,9 +185,9 @@ class WCAS_Auth {
 
 		$state_user_id = get_transient( self::STATE_TRANSIENT_PREFIX . $received_state );
 		$state_valid   = false !== $state_user_id && (int) $state_user_id === get_current_user_id();
-		WCAS_Logger::diagnostic(
-			'oauth',
+		WCAS_Logger::oauth_trace(
 			'validate_state',
+			$state_valid ? 'received' : 'error',
 			$state_valid ? 'success' : 'error',
 			$state_valid ? 'State OAuth2 validado com sucesso.' : 'OAuth callback rejeitado por state inválido ou usuário divergente.',
 			array(
@@ -192,7 +212,7 @@ class WCAS_Auth {
 		}
 		delete_transient( self::STATE_TRANSIENT_PREFIX . $received_state );
 
-		WCAS_Logger::diagnostic( 'oauth', 'token_exchange_started', 'started', 'Iniciando troca do authorization code por tokens OAuth2.', array( 'callback_type' => $callback_type, 'token_url' => (string) WCAS_Utils::get_setting( 'token_url', WCAS_Utils::TOKEN_URL ), 'method' => 'POST', 'code' => $received_code ) );
+		WCAS_Logger::oauth_trace( 'token_exchange_started', 'token', 'started', 'Iniciando troca do authorization code por tokens OAuth2.', array( 'callback_type' => $callback_type, 'token_url' => (string) WCAS_Utils::get_setting( 'token_url', WCAS_Utils::TOKEN_URL ), 'method' => 'POST', 'http_method' => 'POST', 'code' => $received_code, 'redirect_uri' => WCAS_Utils::get_setting( 'redirect_uri' ) ) );
 		$result = $this->exchange_code( $received_code );
 		$message = is_wp_error( $result ) ? 'auth_failed' : 'auth_success';
 		wp_safe_redirect( add_query_arg( array( 'page' => 'wcas-conta-azul', 'wcas_message' => $message, 'tab' => 'logs' ), admin_url( 'admin.php' ) ) );
@@ -314,7 +334,7 @@ class WCAS_Auth {
 		$action_prefix = 'authorization_code' === $grant_type ? 'token_exchange' : 'token_refresh';
 
 		if ( '' === $client_id || '' === $client_secret ) {
-			WCAS_Logger::diagnostic( 'oauth', $action_prefix . '_failed', 'error', 'Client ID ou Client Secret ausente antes da requisição ao token endpoint.', array( 'grant_type' => $grant_type ) );
+			WCAS_Logger::oauth_trace( $action_prefix . '_failed', 'error', 'error', 'Client ID ou Client Secret ausente antes da requisição ao token endpoint.', array( 'grant_type' => $grant_type ) );
 			return new WP_Error( 'wcas_missing_credentials', __( 'Client ID e Client Secret são obrigatórios.', 'woocommerce-conta-azul-sync' ) );
 		}
 
@@ -330,9 +350,9 @@ class WCAS_Auth {
 			'body'     => $body,
 		);
 
-		WCAS_Logger::diagnostic(
-			'oauth',
+		WCAS_Logger::oauth_trace(
 			$action_prefix . '_started',
+			'token',
 			'started',
 			'Iniciando requisição ao token endpoint da Conta Azul.',
 			$request_context
@@ -360,9 +380,9 @@ class WCAS_Auth {
 					'last_token_response'    => $response->get_error_message(),
 				)
 			);
-			WCAS_Logger::diagnostic(
-				'oauth',
+			WCAS_Logger::oauth_trace(
 				$action_prefix . '_failed',
+				'error',
 				'error',
 				'WP_Error ao chamar token endpoint: ' . $response->get_error_message(),
 				array_merge( $request_context, array( 'wp_error' => $response->get_error_message() ) )
@@ -380,30 +400,35 @@ class WCAS_Auth {
 				'last_token_response'    => $response_summary,
 			)
 		);
-		WCAS_Logger::diagnostic(
-			'oauth',
+		WCAS_Logger::oauth_trace(
 			'token_endpoint_response',
+			$status >= 200 && $status < 300 ? 'token' : 'error',
 			$status >= 200 && $status < 300 ? 'success' : 'error',
 			'Resposta recebida do token endpoint da Conta Azul.',
 			array(
-				'endpoint'     => $token_url,
-				'method'       => 'POST',
-				'grant_type'   => $grant_type,
-				'body_summary' => $response_summary,
+				'endpoint'               => $token_url,
+				'method'                 => 'POST',
+				'http_method'            => 'POST',
+				'grant_type'             => $grant_type,
+				'body_summary'           => $response_summary,
+				'body_complete'          => $raw_body,
+				'headers_sent'           => $headers,
+				'token_endpoint_status'  => $status,
 			),
 			$status
 		);
 
 		if ( $status < 200 || $status >= 300 || empty( $data['access_token'] ) || empty( $data['refresh_token'] ) ) {
-			WCAS_Logger::diagnostic(
-				'oauth',
+			WCAS_Logger::oauth_trace(
 				$action_prefix . '_failed',
+				'error',
 				'error',
 				'Falha ao obter token OAuth2 da Conta Azul.',
 				array(
-					'grant_type'   => $grant_type,
-					'response'     => $data,
-					'body_summary' => $response_summary,
+					'grant_type'    => $grant_type,
+					'response'      => $data,
+					'body_summary'  => $response_summary,
+					'body_complete' => $raw_body,
 				),
 				$status
 			);
@@ -411,8 +436,8 @@ class WCAS_Auth {
 		}
 
 		$this->save_tokens( $data );
-		WCAS_Logger::diagnostic( 'oauth', $action_prefix . '_success', 'success', 'Token OAuth2 recebido com sucesso da Conta Azul.', array( 'grant_type' => $grant_type, 'expires_in' => (int) ( $data['expires_in'] ?? 0 ) ), $status );
-		WCAS_Logger::diagnostic( 'oauth', 'oauth_connected', 'success', 'access_token e refresh_token persistidos com segurança.', array( 'expires_in' => (int) ( $data['expires_in'] ?? 0 ), 'token_type' => $data['token_type'] ?? 'Bearer' ), $status );
+		WCAS_Logger::oauth_trace( $action_prefix . '_success', 'token', 'success', 'Token OAuth2 recebido com sucesso da Conta Azul.', array( 'grant_type' => $grant_type, 'expires_in' => (int) ( $data['expires_in'] ?? 0 ) ), $status );
+		WCAS_Logger::oauth_trace( 'oauth_connected', 'token', 'success', 'access_token e refresh_token persistidos com segurança.', array( 'expires_in' => (int) ( $data['expires_in'] ?? 0 ), 'token_type' => $data['token_type'] ?? 'Bearer' ), $status );
 		return $data;
 	}
 
