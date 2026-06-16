@@ -1,0 +1,263 @@
+/** Admin styles for Emissão de Etiquetas Alcateia. */
+.alcateia-admin-wrap {
+	position: relative;
+	isolation: isolate;
+	min-height: calc(100vh - 72px);
+	margin: 20px 20px 0 0;
+	padding: clamp(24px, 4vw, 56px);
+	overflow: hidden;
+	border-radius: 28px;
+	color: #f8fafc;
+	background:
+		radial-gradient(circle at 16% 8%, rgba(190, 24, 93, .34), transparent 28%),
+		radial-gradient(circle at 86% 12%, rgba(14, 165, 233, .28), transparent 30%),
+		linear-gradient(135deg, #0f172a 0%, #111827 46%, #2b122c 100%);
+	box-shadow: 0 24px 80px rgba(2, 6, 23, .35);
+}
+
+.alcateia-admin-wrap * { box-sizing: border-box; }
+
+.alcateia-aurora {
+	position: absolute;
+	z-index: -1;
+	width: 360px;
+	height: 360px;
+	border-radius: 999px;
+	filter: blur(50px);
+	opacity: .45;
+	animation: alcateia-float 9s ease-in-out infinite;
+}
+
+.alcateia-aurora-one { left: -100px; top: 160px; background: #f43f5e; }
+.alcateia-aurora-two { right: -80px; bottom: -90px; background: #38bdf8; animation-delay: -3s; }
+
+.alcateia-glass {
+	border: 1px solid rgba(255, 255, 255, .20);
+	background: linear-gradient(145deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .07));
+	backdrop-filter: blur(22px) saturate(150%);
+	-webkit-backdrop-filter: blur(22px) saturate(150%);
+	box-shadow: 0 22px 60px rgba(0, 0, 0, .20), inset 0 1px 0 rgba(255, 255, 255, .22);
+}
+
+.alcateia-hero {
+	max-width: 1040px;
+	padding: clamp(28px, 5vw, 58px);
+	border-radius: 30px;
+}
+
+.alcateia-hero-logo {
+	max-width: 180px;
+	max-height: 82px;
+	object-fit: contain;
+	margin-bottom: 22px;
+	filter: drop-shadow(0 14px 30px rgba(0, 0, 0, .28));
+}
+
+.alcateia-kicker {
+	margin: 0 0 10px;
+	color: #bae6fd;
+	font-size: 12px;
+	font-weight: 800;
+	letter-spacing: 2.8px;
+	text-transform: uppercase;
+}
+
+.alcateia-hero h1 {
+	max-width: 860px;
+	margin: 0;
+	color: #fff;
+	font-size: clamp(34px, 5vw, 68px);
+	font-weight: 900;
+	line-height: .98;
+	letter-spacing: -2.2px;
+}
+
+.alcateia-subtitle {
+	max-width: 760px;
+	margin: 22px 0 0;
+	color: rgba(248, 250, 252, .82);
+	font-size: clamp(16px, 2vw, 21px);
+	line-height: 1.65;
+}
+
+.alcateia-card-grid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 18px;
+	margin-top: 22px;
+}
+
+.alcateia-card {
+	min-height: 230px;
+	padding: 26px;
+	border-radius: 24px;
+	transition: transform .24s ease, border-color .24s ease, background .24s ease, box-shadow .24s ease;
+}
+
+.alcateia-card:hover {
+	transform: translateY(-7px);
+	border-color: rgba(255, 255, 255, .42);
+	background: linear-gradient(145deg, rgba(255, 255, 255, .23), rgba(255, 255, 255, .10));
+	box-shadow: 0 28px 70px rgba(0, 0, 0, .30), inset 0 1px 0 rgba(255, 255, 255, .24);
+}
+
+.alcateia-card-icon {
+	display: grid;
+	place-items: center;
+	width: 54px;
+	height: 54px;
+	border-radius: 18px;
+	margin-bottom: 20px;
+	font-size: 28px;
+	background: rgba(255, 255, 255, .14);
+}
+
+.alcateia-card h2 {
+	margin: 0 0 10px;
+	color: #fff;
+	font-size: 21px;
+	line-height: 1.15;
+}
+
+.alcateia-card p {
+	margin: 0;
+	color: rgba(248, 250, 252, .76);
+	font-size: 14px;
+	line-height: 1.62;
+}
+
+.alcateia-order-action { clear: both; padding-top: 10px; }
+.alcateia-order-button { box-shadow: 0 10px 24px rgba(30, 64, 175, .25) !important; }
+
+@keyframes alcateia-float {
+	0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+	50% { transform: translate3d(18px, -24px, 0) scale(1.08); }
+}
+
+@media (max-width: 1200px) { .alcateia-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 782px) {
+	.alcateia-admin-wrap { margin-right: 10px; padding: 20px; border-radius: 20px; }
+	.alcateia-card-grid { grid-template-columns: 1fr; }
+	.alcateia-hero { padding: 26px; border-radius: 22px; }
+}
+
+.alcateia-settings {
+	max-width: 1040px;
+	margin-top: 22px;
+	padding: 28px;
+	border-radius: 24px;
+}
+
+.alcateia-settings h2 {
+	margin: 0 0 18px;
+	color: #fff;
+	font-size: 26px;
+}
+
+.alcateia-settings-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 18px;
+}
+
+.alcateia-settings label span {
+	display: block;
+	margin-bottom: 8px;
+	color: rgba(248, 250, 252, .82);
+	font-weight: 700;
+}
+
+.alcateia-settings input,
+.alcateia-settings textarea,
+.alcateia-settings select {
+	width: 100%;
+	max-width: none;
+	border: 1px solid rgba(255, 255, 255, .20);
+	border-radius: 14px;
+	padding: 10px 12px;
+	color: #0f172a;
+	background: rgba(255, 255, 255, .92);
+}
+
+.alcateia-settings-wide { grid-column: 1 / -1; }
+.alcateia-save-button { border-radius: 999px !important; padding-inline: 22px !important; }
+
+.alcateia-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	border-radius: 999px;
+	padding: 4px 9px;
+	font-size: 11px;
+	font-weight: 800;
+	line-height: 1.2;
+}
+
+.alcateia-badge-empty { color: #6b7280; background: #f3f4f6; border: 1px solid #d1d5db; }
+.alcateia-badge-ready { color: #92400e; background: #fef3c7; border: 1px solid #f59e0b; }
+.alcateia-badge-sent { color: #065f46; background: #d1fae5; border: 1px solid #10b981; }
+.alcateia-tracking-box .widefat { margin-top: 5px; }
+.alcateia-send-tracking { text-align: center; }
+
+@media (max-width: 782px) { .alcateia-settings-grid { grid-template-columns: 1fr; } }
+
+.alcateia-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin: 22px 0 0;
+}
+
+.alcateia-tabs a {
+	border: 1px solid rgba(255, 255, 255, .20);
+	border-radius: 999px;
+	padding: 10px 16px;
+	color: rgba(248, 250, 252, .82);
+	text-decoration: none;
+	background: rgba(255, 255, 255, .08);
+	font-weight: 800;
+}
+
+.alcateia-tabs a.is-active,
+.alcateia-tabs a:hover {
+	color: #111827;
+	background: rgba(255, 255, 255, .92);
+}
+
+.alcateia-panel {
+	max-width: 1040px;
+	margin-top: 22px;
+	padding: 28px;
+	border-radius: 24px;
+}
+
+.alcateia-panel h2 {
+	margin-top: 0;
+	color: #fff;
+}
+
+.alcateia-panel p,
+.alcateia-panel li {
+	color: rgba(248, 250, 252, .84);
+	font-size: 15px;
+	line-height: 1.7;
+}
+
+.alcateia-diagnostics {
+	width: 100%;
+	border-collapse: collapse;
+	color: #f8fafc;
+}
+
+.alcateia-diagnostics th,
+.alcateia-diagnostics td {
+	padding: 12px;
+	border-bottom: 1px solid rgba(255, 255, 255, .14);
+	text-align: left;
+	vertical-align: top;
+}
+
+.alcateia-diagnostics th {
+	width: 34%;
+	color: #bae6fd;
+}
