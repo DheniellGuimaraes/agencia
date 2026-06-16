@@ -26,12 +26,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 		.alcateia-label { width: 100mm; min-height: 150mm; page-break-after: always; margin: 0 auto; padding: 4.6mm; background: #fff; border: 1px solid #d7d7d7; overflow: hidden; }
 		.alcateia-label:last-child { page-break-after: auto; }
 		.alcateia-shell { min-height: 140.8mm; border: 1.6px solid #111; border-radius: 4mm; padding: 3.2mm; position: relative; }
-		.alcateia-topbar { display: table; width: 100%; border-bottom: 2.4px solid #111; padding-bottom: 2.6mm; margin-bottom: 2.8mm; }
-		.alcateia-brand, .alcateia-stamp { display: table-cell; vertical-align: middle; }
-		.alcateia-brand { width: 62%; }
-		.alcateia-logo { max-width: 45mm; max-height: 15mm; object-fit: contain; display: block; }
-		.alcateia-stamp { width: 38%; text-align: right; }
-		.alcateia-stamp span { display: inline-block; border: 2px solid #111; border-radius: 999px; padding: 1.3mm 2.4mm; font-size: 8px; font-weight: 900; letter-spacing: 1.1px; text-transform: uppercase; }
+		.alcateia-topbar { width: 100%; border-bottom: 2.4px solid #111; padding-bottom: 2.8mm; margin-bottom: 2.8mm; text-align: center; }
+		.alcateia-brand { text-align: center; }
+		.alcateia-logo { max-width: 48mm; max-height: 16mm; object-fit: contain; display: inline-block; }
 		.alcateia-meta-grid { display: table; width: 100%; table-layout: fixed; margin-bottom: 2.5mm; }
 		.alcateia-meta { display: table-cell; border: 1px solid #111; padding: 1.7mm; vertical-align: top; }
 		.alcateia-meta + .alcateia-meta { border-left: 0; }
@@ -54,10 +51,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 		.alcateia-products th:last-child, .alcateia-products td:last-child { width: 13mm; text-align: right; font-weight: 900; }
 		.alcateia-notes { margin-top: 1.5mm; padding-top: 1.5mm; border-top: 1px dashed #999; font-size: 8.8px; line-height: 1.25; }
 		.alcateia-bottom { position: absolute; left: 3.2mm; right: 3.2mm; bottom: 3mm; }
-		.alcateia-barcode { text-align: center; margin-bottom: 1.7mm; }
+		.alcateia-bottom-grid { display: table; width: 100%; table-layout: fixed; margin-bottom: 1.4mm; }
+		.alcateia-barcode, .alcateia-site-qr { display: table-cell; vertical-align: bottom; text-align: center; }
+		.alcateia-barcode { width: 66%; }
 		.alcateia-barcode-bars { height: 12mm; display: inline-flex; align-items: stretch; gap: 1px; padding: 1.5mm 2mm; border: 1.4px solid #111; background: #fff; }
 		.alcateia-barcode-bars i { display: block; width: 2px; background: #111; }
 		.alcateia-order-number { margin-top: .8mm; font-size: 10px; font-weight: 900; letter-spacing: 1px; }
+		.alcateia-site-qr { width: 34%; }
+		.alcateia-site-qr img { display: inline-block; width: 18mm; height: 18mm; border: 1px solid #111; padding: 1mm; background: #fff; }
+		.alcateia-site-qr span { display: block; margin-top: .6mm; font-size: 6.5px; font-weight: 900; letter-spacing: .35px; color: #333; }
 		.alcateia-footer { display: table; width: 100%; border-top: 1px solid #111; padding-top: 1.3mm; font-size: 7.8px; color: #555; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; }
 		.alcateia-footer span { display: table-cell; }
 		.alcateia-footer span:last-child { text-align: right; }
@@ -83,7 +85,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div class="alcateia-shell">
 				<header class="alcateia-topbar">
 					<div class="alcateia-brand"><img class="alcateia-logo" src="<?php echo esc_url( ALCATEIA_LABELS_LOGO_URL ); ?>" alt="<?php echo esc_attr__( 'Alcateia Editorial', 'emissao-de-etiquetas-alcateia' ); ?>"></div>
-					<div class="alcateia-stamp"><span><?php echo esc_html__( 'Expedição interna', 'emissao-de-etiquetas-alcateia' ); ?></span></div>
 				</header>
 
 				<div class="alcateia-meta-grid">
@@ -129,15 +130,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</section>
 
 				<div class="alcateia-bottom">
-					<div class="alcateia-barcode" aria-label="<?php echo esc_attr( 'Pedido ' . $order_number ); ?>">
-						<div class="alcateia-barcode-bars">
-							<?php foreach ( str_split( $barcode_seed ) as $digit ) : ?>
-								<i style="height:<?php echo esc_attr( 16 + ( (int) $digit * 2 ) ); ?>px"></i><i style="height:28px;width:<?php echo esc_attr( 1 + ( (int) $digit % 3 ) ); ?>px"></i>
-							<?php endforeach; ?>
+					<div class="alcateia-bottom-grid">
+						<div class="alcateia-barcode" aria-label="<?php echo esc_attr( 'Pedido ' . $order_number ); ?>">
+							<div class="alcateia-barcode-bars">
+								<?php foreach ( str_split( $barcode_seed ) as $digit ) : ?>
+									<i style="height:<?php echo esc_attr( 16 + ( (int) $digit * 2 ) ); ?>px"></i><i style="height:28px;width:<?php echo esc_attr( 1 + ( (int) $digit % 3 ) ); ?>px"></i>
+								<?php endforeach; ?>
+							</div>
+							<div class="alcateia-order-number">#<?php echo esc_html( $order_number ); ?></div>
 						</div>
-						<div class="alcateia-order-number">#<?php echo esc_html( $order_number ); ?></div>
+						<div class="alcateia-site-qr">
+							<img src="<?php echo esc_url( 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=1&data=https%3A%2F%2Falcateiaeditorial.com.br' ); ?>" alt="<?php echo esc_attr__( 'QR Code Alcateia Editorial', 'emissao-de-etiquetas-alcateia' ); ?>">
+							<span><?php echo esc_html__( 'alcateiaeditorial.com.br', 'emissao-de-etiquetas-alcateia' ); ?></span>
+						</div>
 					</div>
-					<footer class="alcateia-footer"><span><?php echo esc_html__( 'Alcateia Editorial', 'emissao-de-etiquetas-alcateia' ); ?></span><span><?php echo esc_html__( 'Etiqueta interna', 'emissao-de-etiquetas-alcateia' ); ?></span></footer>
+					<footer class="alcateia-footer"><span><?php echo esc_html__( 'Alcateia Editorial', 'emissao-de-etiquetas-alcateia' ); ?></span><span><?php echo esc_html__( 'Pedido WooCommerce', 'emissao-de-etiquetas-alcateia' ); ?></span></footer>
 				</div>
 			</div>
 		</section>
