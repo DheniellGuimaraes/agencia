@@ -261,3 +261,28 @@
 	width: 34%;
 	color: #bae6fd;
 }
+
+.alcateia-quick-actions {
+	max-width: 1040px;
+	margin-top: 22px;
+	padding: 24px 28px;
+	border-radius: 24px;
+}
+
+.alcateia-quick-actions h2 {
+	margin: 0 0 8px;
+	color: #fff;
+	font-size: 24px;
+}
+
+.alcateia-quick-actions p {
+	margin: 0 0 16px;
+	color: rgba(248, 250, 252, .78);
+}
+
+.alcateia-tracking-cta {
+	border-radius: 999px !important;
+	padding: 8px 18px !important;
+	font-weight: 800 !important;
+	letter-spacing: .4px;
+}

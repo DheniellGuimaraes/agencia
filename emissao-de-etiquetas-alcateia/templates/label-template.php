@@ -60,9 +60,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		.alcateia-site-qr { width: 34%; }
 		.alcateia-site-qr img { display: inline-block; width: 18mm; height: 18mm; border: 1px solid #111; padding: 1mm; background: #fff; }
 		.alcateia-site-qr span { display: block; margin-top: .6mm; font-size: 6.5px; font-weight: 900; letter-spacing: .35px; color: #333; }
-		.alcateia-footer { display: table; width: 100%; border-top: 1px solid #111; padding-top: 1.3mm; font-size: 7.8px; color: #555; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; }
-		.alcateia-footer span { display: table-cell; }
-		.alcateia-footer span:last-child { text-align: right; }
+		.alcateia-footer { width: 100%; border-top: 1px solid #111; padding-top: 1.3mm; text-align: center; font-size: 7.8px; color: #555; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; }
 		@media print { body { background: #fff; } .alcateia-print-toolbar { display: none; } .alcateia-label { border: 0; margin: 0; } }
 	</style>
 </head>
@@ -144,7 +142,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<span><?php echo esc_html__( 'alcateiaeditorial.com.br', 'emissao-de-etiquetas-alcateia' ); ?></span>
 						</div>
 					</div>
-					<footer class="alcateia-footer"><span><?php echo esc_html__( 'Alcateia Editorial', 'emissao-de-etiquetas-alcateia' ); ?></span><span><?php echo esc_html__( 'Pedido WooCommerce', 'emissao-de-etiquetas-alcateia' ); ?></span></footer>
+					<footer class="alcateia-footer">
+						<div align="center"><?php echo esc_html__( 'Alcateia Editorial', 'emissao-de-etiquetas-alcateia' ); ?></div>
+					</footer>
 				</div>
 			</div>
 		</section>

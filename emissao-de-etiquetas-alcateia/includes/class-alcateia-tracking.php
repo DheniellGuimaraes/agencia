@@ -67,9 +67,9 @@ class Alcateia_Tracking {
 			<?php if ( $tracking['code'] ) : ?>
 				<?php if ( $tracking['sent'] ) : ?>
 					<p class="description"><?php echo esc_html__( 'Rastreio já enviado. Reenvie somente se tiver certeza.', 'emissao-de-etiquetas-alcateia' ); ?></p>
-					<p><a class="button button-secondary widefat alcateia-send-tracking" href="<?php echo esc_url( self::send_url( $order->get_id(), true ) ); ?>"><?php echo esc_html__( 'Reenviar rastreio ao cliente', 'emissao-de-etiquetas-alcateia' ); ?></a></p>
+					<p><a class="button button-secondary widefat alcateia-send-tracking" href="<?php echo esc_url( self::send_url( $order->get_id(), true ) ); ?>"><?php echo esc_html__( 'REENVIAR CÓDIGO DE RASTREIO', 'emissao-de-etiquetas-alcateia' ); ?></a></p>
 				<?php else : ?>
-					<p><a class="button button-secondary widefat alcateia-send-tracking" href="<?php echo esc_url( self::send_url( $order->get_id(), false ) ); ?>"><?php echo esc_html__( 'Enviar rastreio ao cliente', 'emissao-de-etiquetas-alcateia' ); ?></a></p>
+					<p><a class="button button-secondary widefat alcateia-send-tracking" href="<?php echo esc_url( self::send_url( $order->get_id(), false ) ); ?>"><?php echo esc_html__( 'ENVIAR CÓDIGO DE RASTREIO', 'emissao-de-etiquetas-alcateia' ); ?></a></p>
 				<?php endif; ?>
 			<?php endif; ?>
 		</div>

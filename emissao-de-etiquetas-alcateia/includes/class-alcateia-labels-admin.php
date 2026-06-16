@@ -114,6 +114,11 @@ class Alcateia_Labels_Admin {
 						</article>
 					<?php endforeach; ?>
 				</div>
+				<div class="alcateia-quick-actions alcateia-glass">
+					<h2><?php echo esc_html__( 'Ações rápidas', 'emissao-de-etiquetas-alcateia' ); ?></h2>
+					<p><?php echo esc_html__( 'Acesse os pedidos para cadastrar e enviar códigos de rastreio aos clientes.', 'emissao-de-etiquetas-alcateia' ); ?></p>
+					<a class="button button-primary alcateia-tracking-cta" href="<?php echo esc_url( admin_url( 'edit.php?post_type=shop_order' ) ); ?>"><?php echo esc_html__( 'ENVIAR CÓDIGO DE RASTREIO', 'emissao-de-etiquetas-alcateia' ); ?></a>
+				</div>
 				<?php Alcateia_Settings::render(); ?>
 			<?php endif; ?>
 		</div>
