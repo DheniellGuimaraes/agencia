@@ -105,8 +105,8 @@ Fluxo implementado:
 3. O usuário é redirecionado para a Conta Azul.
 4. A Conta Azul retorna `code` e `state` para `wp-admin/admin-post.php?action=wcas_oauth_callback`.
 5. O hook `admin_post_wcas_oauth_callback` chama `WCAS_Auth::handle_admin_post_callback()`, valida o `state` e troca o `code` por `access_token` e `refresh_token`.
-6. O plugin renova o token automaticamente antes da expiração.
-7. Em HTTP 401, o client tenta renovar uma vez e reexecutar a chamada.
+6. O plugin renova o token automaticamente antes da expiração. Como o `access_token` da Conta Azul muda aproximadamente de hora em hora, o dashboard e o client da API tentam atualizar o token por `refresh_token` quando ele estiver expirado ou a menos de 10 minutos de expirar.
+7. Em HTTP 401, o client tenta renovar uma vez, salva o novo `access_token` e reexecuta a chamada. Se a Conta Azul não retornar um novo `refresh_token` na renovação, o plugin preserva o `refresh_token` anterior.
 
 ## Endpoints de recursos
 
@@ -229,7 +229,7 @@ Verifique Client ID, Client Secret, Redirect URI e se a aplicação pertence ao 
 
 ### HTTP 401
 
-O plugin tenta renovar o token automaticamente uma vez. Se continuar falhando, desconecte e conecte novamente.
+O plugin tenta renovar o token automaticamente uma vez usando o `refresh_token`, salva o novo `access_token` e repete a requisição. Se continuar falhando ou se o token endpoint retornar `invalid_grant`, desconecte e conecte novamente porque o `refresh_token` pode ter sido expirado, revogado ou gerado com outro `redirect_uri`/`client_id`.
 
 ### Endpoint não encontrado
 

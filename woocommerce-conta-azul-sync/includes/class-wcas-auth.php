@@ -12,7 +12,7 @@ defined( 'ABSPATH' ) || exit;
  */
 class WCAS_Auth {
 	private const STATE_TRANSIENT_PREFIX = 'wcas_oauth_state_';
-	private const TOKEN_REFRESH_MARGIN   = 300;
+	private const TOKEN_REFRESH_MARGIN   = 600;
 
 	/**
 	 * Build authorization URL.
@@ -238,18 +238,38 @@ class WCAS_Auth {
 	 * Return valid access token, refreshing when needed.
 	 */
 	public function get_access_token(): string|WP_Error {
+		$tokens = $this->ensure_tokens_fresh();
+		if ( is_wp_error( $tokens ) ) {
+			return $tokens;
+		}
+		return (string) $tokens['access_token'];
+	}
+
+	/**
+	 * Return saved tokens after proactively refreshing expired or near-expired access tokens.
+	 *
+	 * Conta Azul access tokens are short lived and normally rotate every hour.
+	 * The dashboard and API client both use this method so an expired access token
+	 * is replaced with a fresh one before the status is rendered or a request is sent.
+	 *
+	 * @return array<string, mixed>|WP_Error
+	 */
+	public function ensure_tokens_fresh(): array|WP_Error {
 		$tokens = $this->get_tokens();
 		if ( empty( $tokens['access_token'] ) || empty( $tokens['refresh_token'] ) ) {
 			return new WP_Error( 'wcas_not_connected', __( 'Conta Azul não conectada.', 'woocommerce-conta-azul-sync' ) );
 		}
-		if ( time() + self::TOKEN_REFRESH_MARGIN >= (int) ( $tokens['expires_at'] ?? 0 ) ) {
+
+		$expires_at = (int) ( $tokens['expires_at'] ?? 0 );
+		if ( 0 === $expires_at || time() + self::TOKEN_REFRESH_MARGIN >= $expires_at ) {
 			$refreshed = $this->refresh_token();
 			if ( is_wp_error( $refreshed ) ) {
 				return $refreshed;
 			}
 			$tokens = $this->get_tokens();
 		}
-		return (string) $tokens['access_token'];
+
+		return $tokens;
 	}
 
 	/**
@@ -276,12 +296,17 @@ class WCAS_Auth {
 	 * @param array<string, mixed> $tokens Token payload.
 	 */
 	private function save_tokens( array $tokens ): void {
+		$current       = $this->get_tokens();
+		$refresh_token = (string) ( $tokens['refresh_token'] ?? ( $current['refresh_token'] ?? '' ) );
+		$expires_in    = max( 60, (int) ( $tokens['expires_in'] ?? 3600 ) );
+
 		$data = array(
 			'access_token'  => WCAS_Utils::encrypt_secret( sanitize_text_field( $tokens['access_token'] ?? '' ) ),
-			'refresh_token' => WCAS_Utils::encrypt_secret( sanitize_text_field( $tokens['refresh_token'] ?? '' ) ),
-			'token_type'    => sanitize_text_field( $tokens['token_type'] ?? 'Bearer' ),
-			'expires_at'    => time() + max( 60, (int) ( $tokens['expires_in'] ?? 3600 ) ),
-			'connected_at'  => current_time( 'mysql' ),
+			'refresh_token' => WCAS_Utils::encrypt_secret( sanitize_text_field( $refresh_token ) ),
+			'token_type'    => sanitize_text_field( $tokens['token_type'] ?? ( $current['token_type'] ?? 'Bearer' ) ),
+			'expires_at'    => time() + $expires_in,
+			'connected_at'  => (string) ( $current['connected_at'] ?? current_time( 'mysql' ) ),
+			'refreshed_at'  => current_time( 'mysql' ),
 		);
 		WCAS_Utils::update_option_no_autoload( WCAS_Utils::OPTION_TOKENS, $data );
 	}
@@ -418,7 +443,7 @@ class WCAS_Auth {
 			$status
 		);
 
-		if ( $status < 200 || $status >= 300 || empty( $data['access_token'] ) || empty( $data['refresh_token'] ) ) {
+		if ( $status < 200 || $status >= 300 || empty( $data['access_token'] ) || ( 'authorization_code' === $grant_type && empty( $data['refresh_token'] ) ) ) {
 			WCAS_Logger::oauth_trace(
 				$action_prefix . '_failed',
 				'error',
@@ -436,7 +461,7 @@ class WCAS_Auth {
 		}
 
 		$this->save_tokens( $data );
-		WCAS_Logger::oauth_trace( $action_prefix . '_success', 'token', 'success', 'Token OAuth2 recebido com sucesso da Conta Azul.', array( 'grant_type' => $grant_type, 'expires_in' => (int) ( $data['expires_in'] ?? 0 ) ), $status );
+		WCAS_Logger::oauth_trace( $action_prefix . '_success', 'token', 'success', 'Token OAuth2 recebido com sucesso da Conta Azul.', array( 'grant_type' => $grant_type, 'expires_in' => (int) ( $data['expires_in'] ?? 0 ), 'refresh_token_rotated' => ! empty( $data['refresh_token'] ) ), $status );
 		WCAS_Logger::oauth_trace( 'oauth_connected', 'token', 'success', 'access_token e refresh_token persistidos com segurança.', array( 'expires_in' => (int) ( $data['expires_in'] ?? 0 ), 'token_type' => $data['token_type'] ?? 'Bearer' ), $status );
 		return $data;
 	}

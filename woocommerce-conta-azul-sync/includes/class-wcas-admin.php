@@ -247,7 +247,7 @@ class WCAS_Admin {
 		}
 
 		$settings = WCAS_Utils::get_settings();
-		$tokens   = $this->auth->get_tokens();
+		$tokens   = $this->get_dashboard_tokens();
 		$logs     = WCAS_Logger::get_logs( 100 );
 		$metrics  = $this->get_dashboard_metrics( $logs, $tokens, $settings );
 		?>
@@ -296,6 +296,31 @@ class WCAS_Admin {
 			<?php $this->render_help_panel(); ?>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Load dashboard tokens and refresh them when the access token is expired/near expiry.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function get_dashboard_tokens(): array {
+		if ( ! $this->auth->is_connected() ) {
+			return $this->auth->get_tokens();
+		}
+
+		$tokens = $this->auth->ensure_tokens_fresh();
+		if ( is_wp_error( $tokens ) ) {
+			WCAS_Logger::diagnostic(
+				'oauth',
+				'token_refresh_on_dashboard_failed',
+				'error',
+				'Token expirado não pôde ser renovado automaticamente ao carregar o dashboard. Reconecte se o refresh_token foi revogado ou retornou invalid_grant.',
+				array( 'error' => $tokens->get_error_message() )
+			);
+			return $this->auth->get_tokens();
+		}
+
+		return $tokens;
 	}
 
 	/**
