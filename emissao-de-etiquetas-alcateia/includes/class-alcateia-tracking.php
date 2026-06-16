@@ -64,14 +64,16 @@ class Alcateia_Tracking {
 			<p><label for="alcateia_tracking_shipped_date"><strong><?php echo esc_html__( 'Data de envio', 'emissao-de-etiquetas-alcateia' ); ?></strong></label><input class="widefat" id="alcateia_tracking_shipped_date" name="alcateia_tracking_shipped_date" type="date" value="<?php echo esc_attr( $tracking['shipped_date'] ); ?>"></p>
 			<p><label for="alcateia_tracking_notes"><strong><?php echo esc_html__( 'Observações internas', 'emissao-de-etiquetas-alcateia' ); ?></strong></label><textarea class="widefat" id="alcateia_tracking_notes" name="alcateia_tracking_notes" rows="3"><?php echo esc_textarea( $tracking['notes'] ); ?></textarea></p>
 			<p class="alcateia-tracking-status"><?php self::render_badge( $order ); ?></p>
-			<?php if ( $tracking['code'] ) : ?>
-				<?php if ( $tracking['sent'] ) : ?>
-					<p class="description"><?php echo esc_html__( 'Rastreio já enviado. Reenvie somente se tiver certeza.', 'emissao-de-etiquetas-alcateia' ); ?></p>
-					<p><a class="button button-secondary widefat alcateia-send-tracking" href="<?php echo esc_url( self::send_url( $order->get_id(), true ) ); ?>"><?php echo esc_html__( 'REENVIAR CÓDIGO DE RASTREIO', 'emissao-de-etiquetas-alcateia' ); ?></a></p>
-				<?php else : ?>
-					<p><a class="button button-secondary widefat alcateia-send-tracking" href="<?php echo esc_url( self::send_url( $order->get_id(), false ) ); ?>"><?php echo esc_html__( 'ENVIAR CÓDIGO DE RASTREIO', 'emissao-de-etiquetas-alcateia' ); ?></a></p>
-				<?php endif; ?>
+			<?php if ( $tracking['sent'] ) : ?>
+				<p class="description"><?php echo esc_html__( 'Rastreio já enviado. Use o botão abaixo apenas se quiser reenviar.', 'emissao-de-etiquetas-alcateia' ); ?></p>
+			<?php else : ?>
+				<p class="description alcateia-send-hint"><?php echo esc_html__( 'Preencha o código e clique em Enviar agora.', 'emissao-de-etiquetas-alcateia' ); ?></p>
 			<?php endif; ?>
+			<p>
+				<button type="submit" class="button button-primary widefat alcateia-send-now" name="<?php echo esc_attr( $tracking['sent'] ? 'alcateia_resend_after_save' : 'alcateia_send_after_save' ); ?>" value="1" data-default-label="<?php echo esc_attr__( 'Enviar agora', 'emissao-de-etiquetas-alcateia' ); ?>" data-ready-label="<?php echo esc_attr__( 'Enviar agora', 'emissao-de-etiquetas-alcateia' ); ?>">
+					<?php echo esc_html__( 'Enviar agora', 'emissao-de-etiquetas-alcateia' ); ?>
+				</button>
+			</p>
 		</div>
 		<?php
 	}
@@ -110,6 +112,11 @@ class Alcateia_Tracking {
 			$order->save();
 			$order->add_order_note( __( 'Código de rastreio atualizado.', 'emissao-de-etiquetas-alcateia' ), false, true );
 			Alcateia_Logger::log( 'tracking_updated', __( 'Código de rastreio atualizado.', 'emissao-de-etiquetas-alcateia' ), array( 'order_id' => $order_id ) );
+		}
+
+		if ( isset( $_POST['alcateia_send_after_save'] ) || isset( $_POST['alcateia_resend_after_save'] ) ) {
+			$force_resend = isset( $_POST['alcateia_resend_after_save'] );
+			self::send_tracking_email( $order_id, ! $force_resend );
 		}
 	}
 
