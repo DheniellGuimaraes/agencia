@@ -19,6 +19,7 @@ final class PSI_AI_Plugin {
     public $schema;
     public $backup;
     public $batch;
+    public $resilient_runner;
     public $boldbuilder;
     public $admin;
 
@@ -46,14 +47,17 @@ final class PSI_AI_Plugin {
         $this->backup = new PSI_AI_Backup_Manager();
         $this->boldbuilder = new PSI_AI_BoldBuilder_Adapter();
         $this->batch = new PSI_AI_Batch_Runner($this);
+        $this->resilient_runner = new PSI_AI_Resilient_Runner($this);
         if (is_admin()) { $this->admin = new PSI_AI_Admin($this); $this->admin->init(); }
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend'));
         add_action('wp_head', array($this->schema, 'print_schema'), 20);
         add_action('psi_ai_process_batch', array($this->batch, 'process_scheduled_batch'));
+        add_action('psi_ai_resilient_process_queue', array($this->resilient_runner, 'process_queue'));
+        add_action('psi_ai_resilient_import_sitemaps', array($this->resilient_runner, 'process_sitemap_import'));
     }
 
     private function load_dependencies() {
-        foreach (array('logger','protection-rules','sitemap-reader','page-detector','boldbuilder-adapter','content-cleaner','category-intelligence','semantic-entity-generator','local-context-generator','unique-media-builder','similarity-guard','privilege-visual-builder','semantic-generator','quality-score','schema-generator','backup-manager','batch-runner','admin') as $file) {
+        foreach (array('logger','protection-rules','sitemap-reader','page-detector','boldbuilder-adapter','content-cleaner','category-intelligence','semantic-entity-generator','local-context-generator','unique-media-builder','similarity-guard','privilege-visual-builder','semantic-generator','quality-score','schema-generator','backup-manager','batch-runner','resilient-runner','admin') as $file) {
             require_once PSI_AI_DIR . 'includes/class-' . $file . '.php';
         }
     }
@@ -90,6 +94,8 @@ final class PSI_AI_Plugin {
             'visual_robot' => 1,
             'visual_internal_cards' => 1,
             'visual_premium_faq' => 1,
+            'runner_mode' => 'background',
+            'runner_time_budget' => 20,
         );
     }
 }

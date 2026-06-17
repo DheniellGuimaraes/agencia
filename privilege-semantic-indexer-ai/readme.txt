@@ -56,3 +56,10 @@ O builder possui 6 variações visuais: hero escuro com glass, clean premium, Sa
 A aba Design do Enriquecimento permite ativar visual premium, escolher estilo predominante, ativar SVG exclusivo, robô/IA, cards internos e FAQ premium, pré-visualizar em desktop/tablet/mobile, testar em 10 URLs e exportar HTML preview.
 
 Bloqueio visual: se o HTML final não tiver SVG, CTA, cards suficientes, estilo premium ou apresentar padrão de texto puro, o lote marca a página como Revisão visual obrigatória e bloqueia publicação automática.
+
+== Execução resiliente anti-timeout ==
+Após análise das recomendações sobre Cloudflare 524 e processamento em massa no WordPress, o plugin não executa importação, simulação ou publicação pesada diretamente no admin-post. As ações são enfileiradas em background via Action Scheduler quando disponível e, na ausência dele, por WP-Cron com eventos únicos.
+
+O runner resiliente processa fatias curtas com trava transitória, orçamento de tempo, limite de memória e re-enfileiramento automático do restante. Isso evita requisições HTTP longas no wp-admin, reduz risco de erro 524 e permite continuar o lote até terminar.
+
+Recomendação operacional: em sites com dezenas de milhares de URLs, usar Action Scheduler + WP-CLI para escoar filas grandes, por exemplo `wp action-scheduler run --hooks=psi_ai_resilient_process_queue --batch-size=25`, quando disponível no servidor.

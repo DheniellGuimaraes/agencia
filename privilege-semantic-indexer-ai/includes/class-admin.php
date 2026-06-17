@@ -10,11 +10,11 @@ class PSI_AI_Admin {
     public function handle() {
         if (!current_user_can('manage_options') || !check_admin_referer('psi_ai_action')) wp_die(esc_html__('Acesso negado.', 'privilege-semantic-indexer-ai'));
         $do=sanitize_key($_POST['do'] ?? '');
-        if ($do==='import') $this->plugin->batch->import_sitemaps();
-        if ($do==='simulate') $this->plugin->batch->process_batch(true);
-        if ($do==='process') $this->plugin->batch->process_batch(false);
+        if ($do==='import') $this->plugin->resilient_runner->enqueue_sitemap_import();
+        if ($do==='simulate') $this->plugin->batch->enqueue_batch(true);
+        if ($do==='process') $this->plugin->batch->enqueue_batch(false);
         if ($do==='save_design') $this->save_design_settings();
-        if ($do==='rollout') $this->plugin->batch->process_rollout(sanitize_key($_POST['rollout_mode'] ?? 'test'), absint($_POST['custom_limit'] ?? 0), !empty($_POST['double_confirm']), !empty($_POST['dry_run']));
+        if ($do==='rollout') { $mode=sanitize_key($_POST['rollout_mode'] ?? 'test'); if ($mode==='total' && empty($_POST['double_confirm'])) { wp_safe_redirect(admin_url('admin.php?page=privilege-semantic-indexer&tab=rollout&confirm_required=1')); exit; } $limit = $mode === 'test' ? 500 : ($mode === 'small' ? 2000 : ($mode === 'medium' ? 10000 : ($mode === 'total' ? 117948 : absint($_POST['custom_limit'] ?? 10)))); $this->plugin->batch->enqueue_batch(!empty($_POST['dry_run']), $limit, $mode); }
         wp_safe_redirect(admin_url('admin.php?page=privilege-semantic-indexer&tab=' . sanitize_key($_POST['return_tab'] ?? 'overview'))); exit;
     }
     public function render() {
