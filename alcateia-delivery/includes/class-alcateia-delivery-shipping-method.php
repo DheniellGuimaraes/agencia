@@ -48,7 +48,7 @@ class Alcateia_Delivery_Shipping_Method extends WC_Shipping_Method {
 		$cost=(float)$rule->shipping_cost + (float)($settings['extra_fixed']??0); $cost += $cost * ((float)($settings['extra_percent']??0)/100);
 		if(!empty($settings['min_cost']) && $cost<(float)$settings['min_cost']){$cost=(float)$settings['min_cost'];}
 		if(!empty($settings['max_cost']) && $cost>(float)$settings['max_cost']){$cost=(float)$settings['max_cost'];}
-		$base_days=(int)($rule->delivery_days ?: ($settings['default_days']??7)); $extra_days=max(0,(int)($settings['extra_days']??0)); $days=max(1,$base_days+$extra_days);
+		$base_days=max(1,(int)($settings['default_days']??7)); $extra_days=max(0,(int)($settings['extra_days']??0)); $days=max(1,$base_days+$extra_days);
 		$result=array('cost'=>$cost,'days'=>$days,'rule_id'=>(int)$rule->id,'message'=>'Entrega Express — Receba em até '.$days.' dias úteis');
 		set_transient($key,$result,15 * MINUTE_IN_SECONDS);
 		Alcateia_Delivery_Plugin::log('Regra aplicada',array('rule_id'=>$rule->id,'cost'=>$cost));
