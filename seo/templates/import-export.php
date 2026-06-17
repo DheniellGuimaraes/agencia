@@ -14,6 +14,16 @@
         <div class="notice notice-error"><p>Não foi possível importar o arquivo informado.</p></div>
     <?php endif; ?>
 
+    <?php if (!empty($_GET['import_job'])) : ?>
+        <div class="ses-card" id="ses-import-job" data-job-id="<?php echo esc_attr(sanitize_key($_GET['import_job'])); ?>">
+            <h2>Importação premium em lotes</h2>
+            <p>O arquivo foi recebido. A importação será processada em pequenos lotes via AJAX para evitar timeout 524.</p>
+            <p><button id="ses-import-start" type="button" class="button button-primary">Continuar importação</button> <button id="ses-import-stop" type="button" class="button" disabled>Pausar</button></p>
+            <div class="ses-progress ses-import-progress"><span></span></div>
+            <p id="ses-import-status">Aguardando início.</p>
+        </div>
+    <?php endif; ?>
+
     <div class="ses-card">
         <h2>1. Exportar conteúdo já enriquecido</h2>
         <p>Baixa um JSON com todas as páginas que já possuem <code>_ses_enriched_html</code>.</p>
@@ -39,6 +49,7 @@
     <div class="ses-card">
         <h2>3. Importar no site de destino</h2>
         <p>O importador localiza as páginas por caminho/slug, respeita páginas protegidas e grava metadados, Yoast e conteúdo enriquecido.</p>
+        <p><strong>Modo anti-timeout 524:</strong> após enviar o arquivo, o processamento continua em lotes pequenos via AJAX. Não processe um JSON gigante em uma única requisição.</p>
         <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" enctype="multipart/form-data">
             <?php wp_nonce_field('ses_import_enriched'); ?>
             <input type="hidden" name="action" value="ses_import_enriched">

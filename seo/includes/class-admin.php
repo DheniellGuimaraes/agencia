@@ -32,6 +32,7 @@ class SES_Admin {
         add_action('admin_post_ses_import_enriched', array($this, 'import_enriched'));
         add_action('wp_ajax_ses_scan_batch', array($this, 'ajax_scan_batch'));
         add_action('wp_ajax_ses_enrich_batch', array($this, 'ajax_enrich_batch'));
+        add_action('wp_ajax_ses_import_batch', array($this, 'ajax_import_batch'));
     }
 
     public function menu() {
@@ -218,13 +219,12 @@ class SES_Admin {
             wp_safe_redirect(admin_url('admin.php?page=ses-import-export&import_error=1'));
             exit;
         }
-        $json = file_get_contents($_FILES['ses_import_file']['tmp_name']);
-        $result = $this->import_export->import_payload($json, sanitize_key($_POST['import_mode'] ?? 'meta'));
-        if (is_wp_error($result)) {
+        $job = $this->import_export->create_import_job($_FILES['ses_import_file'], sanitize_key($_POST['import_mode'] ?? 'meta'));
+        if (is_wp_error($job)) {
             wp_safe_redirect(admin_url('admin.php?page=ses-import-export&import_error=1'));
             exit;
         }
-        wp_safe_redirect(admin_url('admin.php?page=ses-import-export&processed=' . absint($result['processed']) . '&imported=' . absint($result['imported']) . '&skipped=' . absint($result['skipped']) . '&errors=' . absint($result['errors'])));
+        wp_safe_redirect(admin_url('admin.php?page=ses-import-export&import_job=' . rawurlencode($job['id'])));
         exit;
     }
 
@@ -237,6 +237,22 @@ class SES_Admin {
         header('Content-Disposition: attachment; filename="' . sanitize_file_name($filename) . '"');
         echo wp_json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
+    }
+
+
+    public function ajax_import_batch() {
+        SES_Security::verify_ajax('ses_ajax');
+        if (function_exists('ignore_user_abort')) {
+            ignore_user_abort(true);
+        }
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(25);
+        }
+        $result = $this->import_export->process_import_job(sanitize_key($_POST['job_id'] ?? ''), min(50, max(1, absint($_POST['limit'] ?? 20))), absint($_POST['seconds'] ?? 8));
+        if (is_wp_error($result)) {
+            wp_send_json_error(array('message' => $result->get_error_message()), 400);
+        }
+        wp_send_json_success($result);
     }
 
     public function ajax_scan_batch() {

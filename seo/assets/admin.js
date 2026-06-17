@@ -225,5 +225,83 @@
             $(this).prop('disabled', true);
             setAutoEnrichStatus('Enriquecimento pausado no ultimo ID ' + autoEnrichLastId + '.', 0);
         });
+
+
+        var importRunning = false;
+        var importFailures = 0;
+        var importJob = $('#ses-import-job').data('job-id') || '';
+
+        function setImportStatus(message, percent) {
+            $('#ses-import-status').text(message);
+            $('.ses-import-progress span').css('width', Math.max(0, Math.min(100, percent || 0)) + '%');
+        }
+
+        function runImportBatch() {
+            if (!importRunning || !importJob) {
+                return;
+            }
+            $.post(SESAdmin.ajaxurl, {
+                action: 'ses_import_batch',
+                nonce: SESAdmin.nonce,
+                job_id: importJob,
+                limit: 20,
+                seconds: 8
+            }).done(function (response) {
+                if (!response || !response.success) {
+                    retryImport('Resposta invalida do servidor.');
+                    return;
+                }
+                var data = response.data || {};
+                importFailures = 0;
+                var processed = parseInt(data.processed, 10) || 0;
+                var imported = parseInt(data.imported, 10) || 0;
+                var skipped = parseInt(data.skipped, 10) || 0;
+                var errors = parseInt(data.errors, 10) || 0;
+                setImportStatus('Processadas: ' + processed + ' | Importadas: ' + imported + ' | Ignoradas: ' + skipped + ' | Erros: ' + errors + '.', data.done ? 100 : 50);
+                if (data.done) {
+                    importRunning = false;
+                    $('#ses-import-start').prop('disabled', false);
+                    $('#ses-import-stop').prop('disabled', true);
+                    setImportStatus('Importação concluída. Processadas: ' + processed + ' | Importadas: ' + imported + ' | Ignoradas: ' + skipped + ' | Erros: ' + errors + '.', 100);
+                    return;
+                }
+                window.setTimeout(runImportBatch, 250);
+            }).fail(function () {
+                retryImport('Falha na requisição AJAX.');
+            });
+        }
+
+        function retryImport(reason) {
+            importFailures++;
+            if (importFailures > 8) {
+                importRunning = false;
+                $('#ses-import-start').prop('disabled', false);
+                $('#ses-import-stop').prop('disabled', true);
+                setImportStatus(reason + ' Importação pausada. Clique em continuar para retomar.', 0);
+                return;
+            }
+            setImportStatus(reason + ' Tentando novamente...', 0);
+            window.setTimeout(runImportBatch, 2500);
+        }
+
+        $('#ses-import-start').on('click', function () {
+            importRunning = true;
+            importFailures = 0;
+            $(this).prop('disabled', true);
+            $('#ses-import-stop').prop('disabled', false);
+            setImportStatus('Importação iniciada em lotes...', 1);
+            runImportBatch();
+        });
+
+        $('#ses-import-stop').on('click', function () {
+            importRunning = false;
+            $('#ses-import-start').prop('disabled', false);
+            $(this).prop('disabled', true);
+            setImportStatus('Importação pausada. Clique em continuar para retomar.', 0);
+        });
+
+        if (importJob) {
+            $('#ses-import-start').trigger('click');
+        }
     });
 })(jQuery);
