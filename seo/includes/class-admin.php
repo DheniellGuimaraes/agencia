@@ -67,7 +67,12 @@ class SES_Admin {
             wp_die(esc_html__('Permissao negada.', 'seo-enrichment-studio'));
         }
         extract($vars, EXTR_SKIP);
-        include SES_PATH . 'templates/' . $template . '.php';
+        $template_path = SES_PATH . 'templates/' . $template . '.php';
+        if (!file_exists($template_path)) {
+            echo '<div class="wrap ses-admin"><h1>' . esc_html__('SEO Enrichment Studio', 'seo-enrichment-studio') . '</h1><div class="notice notice-error"><p>' . esc_html(sprintf(__('Template administrativo nao encontrado: %s', 'seo-enrichment-studio'), $template)) . '</p></div></div>';
+            return;
+        }
+        include $template_path;
     }
 
     public function dashboard() {
