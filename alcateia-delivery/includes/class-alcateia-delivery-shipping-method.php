@@ -24,7 +24,8 @@ class Alcateia_Delivery_Shipping_Method extends WC_Shipping_Method {
 	public static function calculate_estimate( $data, $settings = array() ) {
 		global $wpdb; $table=Alcateia_Delivery_DB::table_name();
 		$qty=(int)($data['qty']??1); $weight=(float)($data['weight']??0.1); $region=sanitize_text_field($data['region']??'R4'); $subtotal=round((float)($data['subtotal']??0),2);
-		$dashboard_settings = wp_parse_args( (array) get_option( 'alcateia_delivery_settings', array() ), array( 'default_days' => 7, 'extra_days' => 0 ) );
+		$saved_delivery_settings = wp_parse_args( (array) get_option( 'alcateia_delivery_settings', array() ), array( 'default_days' => 7, 'extra_days' => 0 ) );
+		$dashboard_settings = array( 'default_days' => get_option( 'alcateia_delivery_default_days', $saved_delivery_settings['default_days'] ), 'extra_days' => get_option( 'alcateia_delivery_extra_days', $saved_delivery_settings['extra_days'] ) );
 		$settings = wp_parse_args( (array) $settings, array( 'calculation_mode' => 'weight', 'extra_fixed' => 0, 'extra_percent' => 0, 'min_cost' => 0, 'max_cost' => 0 ) );
 		$settings['default_days'] = max( 1, absint( $dashboard_settings['default_days'] ) );
 		$settings['extra_days'] = max( 0, absint( $dashboard_settings['extra_days'] ) );
