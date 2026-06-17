@@ -124,7 +124,11 @@ class SES_Admin {
     }
 
     public function import_export_page() {
-        $this->render('import-export', array('settings' => $this->settings->all()));
+        $this->render('import-export', array(
+            'settings' => $this->settings->all(),
+            'eligible_total' => $this->enrichment->eligible_total(),
+            'sitemap_sync' => get_option('ses_sitemap_last_sync', array()),
+        ));
     }
 
     public function save_settings() {

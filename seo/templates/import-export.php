@@ -1,7 +1,7 @@
 <?php if (!defined('ABSPATH')) { exit; } ?>
 <div class="wrap ses-admin">
     <h1>Importar/Exportar enriquecimentos</h1>
-    <p>Use esta tela para gerar o enriquecimento em um ambiente mais rápido, baixar um JSON portátil e importar o resultado no site de produção sem processar tudo lá.</p>
+    <p>Fluxo premium simplificado: o plugin usa os sitemaps configurados, ignora páginas protegidas e enriquece em lotes automáticos sem baixar/importar JSON manualmente.</p>
 
     <?php if (isset($_GET['imported'])) : ?>
         <div class="notice notice-success"><p>
@@ -23,6 +23,26 @@
             <p id="ses-import-status">Aguardando início.</p>
         </div>
     <?php endif; ?>
+
+    <div class="ses-card ses-premium-enrich">
+        <h2>Enriquecimento premium automático dos sitemaps</h2>
+        <p>Sem upload de JSON: ao iniciar, o plugin sincroniza os sitemaps salvos nas configurações, encontra as páginas do WordPress, pula as protegidas e enriquece em lotes para evitar timeout.</p>
+        <p>Elegíveis agora: <strong id="ses-enrich-total"><?php echo esc_html(absint($eligible_total ?? 0)); ?></strong></p>
+        <?php if (!empty($sitemap_sync)) : ?>
+            <p>Última sincronização: <?php echo esc_html($sitemap_sync['synced_at'] ?? ''); ?> | URLs: <?php echo esc_html(absint($sitemap_sync['urls'] ?? 0)); ?> | Encontradas: <?php echo esc_html(absint($sitemap_sync['matched'] ?? 0)); ?> | Elegíveis: <?php echo esc_html(absint($sitemap_sync['eligible'] ?? 0)); ?> | Protegidas: <?php echo esc_html(absint($sitemap_sync['protected'] ?? 0)); ?></p>
+        <?php endif; ?>
+        <p>
+            <label>Lote <input id="ses-enrich-limit" type="number" value="10" min="1" max="50"></label>
+            <button id="ses-auto-enrich-start" class="button button-primary" type="button">Iniciar enriquecimento dos sitemaps</button>
+            <button id="ses-auto-enrich-stop" class="button" type="button" disabled>Pausar</button>
+        </p>
+        <div class="ses-progress ses-enrich-progress"><span></span></div>
+        <p id="ses-auto-enrich-status">Aguardando início.</p>
+    </div>
+
+    <details class="ses-card">
+        <summary><strong>Ferramentas avançadas de JSON manual</strong></summary>
+        <p>Use estas opções apenas para migração entre ambientes. Para o fluxo normal, prefira o enriquecimento automático dos sitemaps acima.</p>
 
     <div class="ses-card">
         <h2>1. Exportar conteúdo já enriquecido</h2>
@@ -47,7 +67,7 @@
     </div>
 
     <div class="ses-card">
-        <h2>3. Importar no site de destino</h2>
+        <h2>3. Importar JSON manual no site de destino</h2>
         <p>O importador localiza as páginas por caminho/slug, respeita páginas protegidas e grava metadados, Yoast e conteúdo enriquecido.</p>
         <p><strong>Modo anti-timeout 524:</strong> após enviar o arquivo, o processamento continua em lotes pequenos via AJAX. Não processe um JSON gigante em uma única requisição.</p>
         <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" enctype="multipart/form-data">
@@ -62,4 +82,5 @@
             <?php submit_button('Importar JSON', 'primary', 'submit', false); ?>
         </form>
     </div>
+    </details>
 </div>
