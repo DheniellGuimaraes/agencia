@@ -17,7 +17,7 @@
     <?php if (!empty($_GET['import_job'])) : ?>
         <div class="ses-card" id="ses-import-job" data-job-id="<?php echo esc_attr(sanitize_key($_GET['import_job'])); ?>">
             <h2>Importação premium em lotes</h2>
-            <p>O arquivo foi recebido. A importação será processada em pequenos lotes via AJAX para evitar timeout 524.</p>
+            <p>Este bloco só é necessário quando você enviou um JSON manual. Se o objetivo é enriquecer pelos sitemaps, ignore este bloco e use o botão azul da seção abaixo.</p><p>Se você realmente enviou um JSON, clique em <strong>Continuar importação</strong> para retomar o processamento em lotes.</p>
             <p><button id="ses-import-start" type="button" class="button button-primary">Continuar importação</button> <button id="ses-import-stop" type="button" class="button" disabled>Pausar</button></p>
             <div class="ses-progress ses-import-progress"><span></span></div>
             <p id="ses-import-status">Aguardando início.</p>
@@ -26,14 +26,14 @@
 
     <div class="ses-card ses-premium-enrich">
         <h2>Enriquecimento premium automático dos sitemaps</h2>
-        <p>Sem upload de JSON: ao iniciar, o plugin sincroniza os sitemaps salvos nas configurações, encontra as páginas do WordPress, pula as protegidas e enriquece em lotes para evitar timeout.</p>
-        <p>Elegíveis agora: <strong id="ses-enrich-total"><?php echo esc_html(absint($eligible_total ?? 0)); ?></strong></p>
+        <p><strong>O que fazer:</strong> clique em <strong>Iniciar enriquecimento dos sitemaps</strong>. O plugin sincroniza os sitemaps salvos nas configurações, encontra as páginas do WordPress, pula as protegidas e enriquece em lotes para evitar timeout.</p>
+        <p>Elegíveis antes da próxima sincronização (pode aparecer 0 antes de iniciar): <strong id="ses-enrich-total"><?php echo esc_html(absint($eligible_total ?? 0)); ?></strong></p>
         <?php if (!empty($sitemap_sync)) : ?>
             <p>Última sincronização: <?php echo esc_html($sitemap_sync['synced_at'] ?? ''); ?> | URLs: <?php echo esc_html(absint($sitemap_sync['urls'] ?? 0)); ?> | Encontradas: <?php echo esc_html(absint($sitemap_sync['matched'] ?? 0)); ?> | Elegíveis: <?php echo esc_html(absint($sitemap_sync['eligible'] ?? 0)); ?> | Protegidas: <?php echo esc_html(absint($sitemap_sync['protected'] ?? 0)); ?></p>
         <?php endif; ?>
         <p>
             <label>Lote <input id="ses-enrich-limit" type="number" value="10" min="1" max="50"></label>
-            <button id="ses-auto-enrich-start" class="button button-primary" type="button">Iniciar enriquecimento dos sitemaps</button>
+            <button id="ses-auto-enrich-start" class="button button-primary" type="button">Clique aqui para enriquecer pelos sitemaps</button>
             <button id="ses-auto-enrich-stop" class="button" type="button" disabled>Pausar</button>
         </p>
         <div class="ses-progress ses-enrich-progress"><span></span></div>
