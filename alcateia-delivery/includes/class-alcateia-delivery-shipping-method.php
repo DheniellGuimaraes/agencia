@@ -18,17 +18,16 @@ class Alcateia_Delivery_Shipping_Method extends WC_Shipping_Method {
 		$region = self::state_to_region( $package['destination']['state'] ?? '' );
 		$result = self::calculate_estimate( array( 'qty'=>$qty,'weight'=>$weight,'region'=>$region,'subtotal'=>(float)($package['contents_cost']??0),'destination'=>$package['destination']??array(),'contents'=>$package['contents']??array() ), $this->settings );
 		if ( ! $result ) { return; }
-		$this->add_rate(array('id'=>$this->id,'label'=>$this->title . ' — Receba em até ' . (int)$result['days'] . ' dias úteis','cost'=>(float)$result['cost'],'meta_data'=>array('rule_id'=>$result['rule_id'])));
+		$this->add_rate(array('id'=>$this->id,'label'=>Alcateia_Delivery_Deadline::label_text($this->title),'cost'=>(float)$result['cost'],'meta_data'=>array('rule_id'=>$result['rule_id'],'delivery_days'=>$result['days'])));
 	}
 	public static function state_to_region( $state ) { $state = strtoupper( (string) $state ); $map=array('SP'=>'R1','RJ'=>'R2','ES'=>'R2','MG'=>'R2','PR'=>'R2','SC'=>'R2','RS'=>'R2','GO'=>'R3','DF'=>'R3','MT'=>'R3','MS'=>'R3','PA'=>'R3','AM'=>'R3'); return $map[$state]??'R4'; }
 	public static function calculate_estimate( $data, $settings = array() ) {
 		global $wpdb; $table=Alcateia_Delivery_DB::table_name();
 		$qty=(int)($data['qty']??1); $weight=(float)($data['weight']??0.1); $region=sanitize_text_field($data['region']??'R4'); $subtotal=round((float)($data['subtotal']??0),2);
-		$saved_delivery_settings = wp_parse_args( (array) get_option( 'alcateia_delivery_settings', array() ), array( 'default_days' => 7, 'extra_days' => 0 ) );
-		$dashboard_settings = array( 'default_days' => get_option( 'alcateia_delivery_default_days', $saved_delivery_settings['default_days'] ), 'extra_days' => get_option( 'alcateia_delivery_extra_days', $saved_delivery_settings['extra_days'] ) );
+		$deadline_settings = Alcateia_Delivery_Deadline::get_settings();
 		$settings = wp_parse_args( (array) $settings, array( 'calculation_mode' => 'weight', 'extra_fixed' => 0, 'extra_percent' => 0, 'min_cost' => 0, 'max_cost' => 0 ) );
-		$settings['default_days'] = max( 1, absint( $dashboard_settings['default_days'] ) );
-		$settings['extra_days'] = max( 0, absint( $dashboard_settings['extra_days'] ) );
+		$settings['default_days'] = $deadline_settings['base_days'];
+		$settings['extra_days'] = $deadline_settings['extra_days'];
 		$key='alcateia_rate_'.md5(wp_json_encode($data).wp_json_encode($settings).Alcateia_Delivery_Plugin::cache_version());
 		if ( false !== ( $cached = get_transient( $key ) ) ) { return $cached; }
 		$mode = isset($settings['calculation_mode']) ? $settings['calculation_mode'] : 'weight';
@@ -48,7 +47,7 @@ class Alcateia_Delivery_Shipping_Method extends WC_Shipping_Method {
 		$cost=(float)$rule->shipping_cost + (float)($settings['extra_fixed']??0); $cost += $cost * ((float)($settings['extra_percent']??0)/100);
 		if(!empty($settings['min_cost']) && $cost<(float)$settings['min_cost']){$cost=(float)$settings['min_cost'];}
 		if(!empty($settings['max_cost']) && $cost>(float)$settings['max_cost']){$cost=(float)$settings['max_cost'];}
-		$base_days=max(1,(int)($settings['default_days']??7)); $extra_days=max(0,(int)($settings['extra_days']??0)); $days=max(1,$base_days+$extra_days);
+		$days=Alcateia_Delivery_Deadline::total_days();
 		$result=array('cost'=>$cost,'days'=>$days,'rule_id'=>(int)$rule->id,'message'=>'Entrega Express — Receba em até '.$days.' dias úteis');
 		set_transient($key,$result,15 * MINUTE_IN_SECONDS);
 		Alcateia_Delivery_Plugin::log('Regra aplicada',array('rule_id'=>$rule->id,'cost'=>$cost));

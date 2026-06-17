@@ -13,6 +13,7 @@ class Alcateia_Delivery_Plugin {
 		add_action( 'rest_api_init', array( $this, 'register_rest' ) );
 		add_action( 'wp_ajax_alcateia_delivery_simulate', array( $this, 'ajax_simulate' ) );
 		add_action( 'wp_ajax_nopriv_alcateia_delivery_simulate', array( $this, 'ajax_simulate' ) );
+		add_filter( 'woocommerce_cart_shipping_method_full_label', array( $this, 'shipping_method_full_label' ), 10, 2 );
 		( new Alcateia_Delivery_Admin() )->hooks();
 		( new Alcateia_Delivery_Shortcode() )->hooks();
 	}
@@ -29,6 +30,7 @@ class Alcateia_Delivery_Plugin {
 		update_option( 'alcateia_delivery_last_calc', gmdate( 'c' ), false );
 		wp_send_json_success( $result ?: array( 'message' => 'Sem cobertura para os dados informados.' ) );
 	}
+	public function shipping_method_full_label( $label, $method ) { if ( is_object( $method ) && method_exists( $method, 'get_method_id' ) && 'alcateia_delivery' === $method->get_method_id() ) { return Alcateia_Delivery_Deadline::replace_days_in_label( $label ); } return $label; }
 	public function register_rest() {
 		register_rest_route( 'alcateia-delivery/v1', '/health', array( 'methods' => 'GET', 'callback' => function(){ return rest_ensure_response( Alcateia_Delivery_Observability::health_report() ); }, 'permission_callback' => array( $this, 'rest_can_manage' ) ) );
 		register_rest_route( 'alcateia-delivery/v1', '/license', array( 'methods' => 'POST', 'callback' => array( $this, 'rest_license' ), 'permission_callback' => array( $this, 'rest_can_manage' ) ) );

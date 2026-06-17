@@ -27,6 +27,7 @@ require_once ALCATEIA_DELIVERY_PATH . 'includes/engine/interface-alcateia-delive
 require_once ALCATEIA_DELIVERY_PATH . 'includes/engine/class-alcateia-delivery-table-strategy.php';
 require_once ALCATEIA_DELIVERY_PATH . 'includes/engine/class-alcateia-delivery-rule-engine.php';
 require_once ALCATEIA_DELIVERY_PATH . 'includes/class-alcateia-delivery-importer.php';
+require_once ALCATEIA_DELIVERY_PATH . 'includes/class-alcateia-delivery-deadline.php';
 require_once ALCATEIA_DELIVERY_PATH . 'includes/class-alcateia-delivery-admin.php';
 require_once ALCATEIA_DELIVERY_PATH . 'includes/class-alcateia-delivery-shortcode.php';
 require_once ALCATEIA_DELIVERY_PATH . 'includes/class-alcateia-delivery-plugin.php';
