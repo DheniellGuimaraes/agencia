@@ -100,15 +100,27 @@ class RSB_Jogos {
 
     public static function is_bettable_at($jogo, int $now): bool {
         if(!$jogo){return false;}
-        if(($jogo->status ?? '') !== 'agendado'){ return false; }
+        if(!self::has_defined_teams($jogo)){ return false; }
+        if(!in_array(($jogo->status ?? ''), ['agendado', 'aguardando_classificados'], true)){ return false; }
         if(empty($jogo->data_jogo) || empty($jogo->hora_jogo)){ return false; }
         $lock = self::lock_timestamp($jogo);
         return $lock && $now < $lock;
     }
 
+    public static function has_defined_teams($jogo): bool {
+        if (!$jogo) { return false; }
+        $home = trim((string)($jogo->time_mandante ?? ''));
+        $away = trim((string)($jogo->time_visitante ?? ''));
+        if ($home === '' || $away === '') { return false; }
+        if (class_exists('RSB_Copa2026_Bracket')) {
+            return !RSB_Copa2026_Bracket::is_empty_or_placeholder_team($home) && !RSB_Copa2026_Bracket::is_empty_or_placeholder_team($away);
+        }
+        return true;
+    }
+
     public static function betting_status($jogo): string {
         if(!$jogo){ return 'indisponivel'; }
-        if(($jogo->status ?? '') === 'aguardando_classificados'){ return 'aguardando_classificados'; }
+        if(($jogo->status ?? '') === 'aguardando_classificados' && !self::has_defined_teams($jogo)){ return 'aguardando_classificados'; }
         if(($jogo->status ?? '') === 'finalizado'){ return 'finalizado'; }
         if(empty($jogo->data_jogo) || empty($jogo->hora_jogo)){ return 'indisponivel'; }
         try {

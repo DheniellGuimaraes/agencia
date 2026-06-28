@@ -6,5 +6,5 @@
 <div class="rsb-card"><span>Jogos</span><strong><?php echo esc_html(count($jogos)); ?></strong></div>
 <div class="rsb-card"><span>Palpites</span><strong><?php echo esc_html(count($palpites)); ?></strong></div>
 <div class="rsb-card"><span>Líder atual</span><strong><?php echo esc_html($ranking[0]->nome ?? 'Aguardando'); ?></strong></div>
-</div><p><button class="button button-primary" id="rsb-recalculate">Recalcular Pontuação e Ranking</button></p>
+</div><p><button class="button button-primary" id="rsb-recalculate">Recalcular Pontuação e Ranking</button> <a class="button" href="<?php echo esc_url(admin_url('admin.php?page=rsb-atualizacao')); ?>">Atualizacao de confrontos</a></p>
 <div class="rsb-panel"><h2>Ranking resumido</h2><?php include RSB_PATH.'admin/views/ranking-table.php'; ?></div></div>

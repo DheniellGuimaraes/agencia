@@ -43,6 +43,7 @@ final class Resenha_Sagrada_Bolao {
         add_action('admin_menu', ['RSB_Admin_Menu', 'register']);
         add_action('admin_post_rsb_export_report', ['RSB_Admin_Menu', 'export_report']);
         add_action('admin_post_rsb_recalculate_bracket', ['RSB_Admin_Menu', 'recalculate_bracket']);
+        add_action('admin_post_rsb_update_future_matches', ['RSB_Admin_Menu', 'update_future_matches']);
         add_action('rest_api_init', ['RSB_Ajax', 'register_rest_routes']);
         RSB_Ajax::register_ajax();
         if (get_option('rsb_db_version') !== RSB_VERSION) {

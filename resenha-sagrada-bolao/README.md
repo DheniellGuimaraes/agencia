@@ -145,4 +145,5 @@ A partir da versao 2026.10, o bolao nao tem limite de maus elementos. O valor in
 - Mantida a preservacao de IDs dos jogos, placares oficiais, palpites registrados, pagamentos, ranking e logs.
 - Reforcada a blindagem para preservar selecoes preenchidas manualmente nos slots do mata-mata e nao alterar status, fase, data ou horario dos jogos durante o recálculo.
 - O gatilho automatico ao salvar resultado agora propaga apenas para fases futuras dependentes do jogo alterado, sem reconstruir fases anteriores ou confrontos independentes.
+- Adicionada aba administrativa **Atualizacao** para autopreencher classificados das proximas fases e liberar palpites futuros quando os confrontos ja tiverem selecoes definidas.
 

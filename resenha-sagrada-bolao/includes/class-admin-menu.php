@@ -12,6 +12,7 @@ class RSB_Admin_Menu {
             'jogos' => 'Jogos Oficiais',
             'importar-copa' => 'Importar Copa 2026',
             'importar-paginas' => 'Importar Paginas',
+            'atualizacao' => 'Atualizacao',
             'palpites' => 'Palpites',
             'resultados' => 'Resultados',
             'ranking' => 'Ranking',
@@ -39,6 +40,22 @@ class RSB_Admin_Menu {
         include RSB_PATH . 'admin/views/' . $view . '.php';
     }
 
+
+
+    public static function update_future_matches(): void {
+        if (!current_user_can(rsb_admin_cap())) {
+            wp_die(esc_html__('Acesso negado.', 'resenha-sagrada-bolao'));
+        }
+        check_admin_referer('rsb_update_future_matches');
+        $bolao = RSB_Bolao::current();
+        $warnings = [];
+        if ($bolao && class_exists('RSB_Copa2026_Bracket')) {
+            $warnings = RSB_Copa2026_Bracket::recalculate_bracket((int) $bolao->id);
+            set_transient('rsb_update_future_notice_' . get_current_user_id(), $warnings, 60);
+        }
+        wp_safe_redirect(admin_url('admin.php?page=rsb-atualizacao&rsb_updated=1'));
+        exit;
+    }
 
     public static function recalculate_bracket(): void {
         if (!current_user_can(rsb_admin_cap())) {
