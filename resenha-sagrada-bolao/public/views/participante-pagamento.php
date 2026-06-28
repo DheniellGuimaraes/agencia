@@ -1,0 +1,2 @@
+<?php if (!defined('ABSPATH')) exit; ?>
+<div class="rsb-public rsb-section"><h3>Meu pagamento</h3><?php if(!$participant): ?><p>Faça login com um usuário vinculado ao bolão.</p><?php else: ?><div class="rsb-card"><p><strong>Status:</strong> <?php echo esc_html(ucfirst($participant->status_pagamento)); ?></p><p><strong>Valor pago:</strong> <?php echo esc_html(rsb_money((float)$participant->valor_pago)); ?></p><p><strong>Data:</strong> <?php echo esc_html($participant->data_pagamento ?: 'Ainda não informado'); ?></p></div><?php endif; ?></div>
