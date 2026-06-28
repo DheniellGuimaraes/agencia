@@ -120,7 +120,10 @@ class RSB_Copa2026_Bracket {
             foreach (['mandante'=>'time_mandante','visitante'=>'time_visitante'] as $side => $field) {
                 if ($only_groups && !self::placeholder_mentions_groups((string) $game->{$field}, $only_groups)) { continue; }
                 $team = self::resolve_group_placeholder((string) $game->{$field}, $q);
-                if (is_wp_error($team)) { $warnings[] = $team->get_error_message(); continue; }
+                if (is_wp_error($team)) {
+                    $warnings[] = $team->get_error_message();
+                    $team = self::known_round_of_32_team((string) $game->codigo_jogo, $side);
+                }
                 if (!$team) { $team = self::known_round_of_32_team((string) $game->codigo_jogo, $side); }
                 if ($team) {
                     $updated = self::safe_update_match_team((int)$game->id, $side, $team, 'auto_bracket_update');
