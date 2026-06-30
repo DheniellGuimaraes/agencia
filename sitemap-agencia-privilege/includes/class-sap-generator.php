@@ -138,12 +138,34 @@ class SAP_Generator {
 	public static function finalize() {
 		$state = get_option( SAP_OPTION_STATE, array() );
 		if ( ! empty( $state['tasks'] ) ) { foreach ( $state['tasks'] as &$task ) { self::close_current_file( $task, $state ); } }
-		$info = SAP_Files::upload_info();
-		$index = SAP_Files::safe_path( 'sitemap.xml' );
+
+		$use_root_urls = SAP_Files::can_mirror_to_root();
+		$upload_info   = SAP_Files::upload_info();
+		$root_info     = SAP_Files::root_info();
+		$base_url      = $use_root_urls ? $root_info['url'] : $upload_info['url'];
+
+		if ( $use_root_urls ) {
+			foreach ( (array) $state['files'] as $file ) {
+				SAP_Files::mirror_to_root( $file['name'] );
+			}
+		}
+
 		$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<sitemapindex xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
-		foreach ( (array) $state['files'] as $file ) { $xml .= "  <sitemap>\n    <loc>" . esc_url( trailingslashit( $info['url'] ) . $file['name'] ) . "</loc>\n    <lastmod>" . esc_html( $file['lastmod'] ) . "</lastmod>\n  </sitemap>\n"; }
+		foreach ( (array) $state['files'] as $file ) {
+			$xml .= "  <sitemap>\n    <loc>" . esc_url( trailingslashit( $base_url ) . $file['name'] ) . "</loc>\n    <lastmod>" . esc_html( $file['lastmod'] ) . "</lastmod>\n  </sitemap>\n";
+		}
 		$xml .= "</sitemapindex>\n";
-		file_put_contents( $index, $xml, LOCK_EX );
+
+		$upload_index = SAP_Files::safe_path( 'sitemap.xml' );
+		file_put_contents( $upload_index, $xml, LOCK_EX );
+
+		if ( $use_root_urls ) {
+			$root_index = SAP_Files::safe_root_path( 'sitemap.xml' );
+			if ( $root_index ) {
+				file_put_contents( $root_index, $xml, LOCK_EX );
+			}
+		}
+
 		$state['finished'] = true;
 		update_option( SAP_OPTION_STATE, $state, false );
 		update_option( SAP_OPTION_LAST_RUN, current_time( 'mysql' ), false );

@@ -23,3 +23,6 @@ Gerador premium de sitemaps XML físicos, salvos em wp-content/uploads/sitemap-a
 * Sitemap index físico e sitemaps filhos por tipo.
 * Cursores por ID para post types.
 * Configurações persistentes, progresso, logs e diagnóstico.
+
+== Google Search Console ==
+Quando a raiz do WordPress tiver permissão de escrita, o plugin espelha sitemap.xml e os arquivos sitemap-*.xml na raiz do site para que o Google consiga buscar /sitemap.xml e todos os filhos (/sitemap-pages-1.xml, /sitemap-pages-2.xml etc.). Se a raiz não tiver escrita, os arquivos continuam disponíveis na pasta de uploads do plugin.
