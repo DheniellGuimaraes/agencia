@@ -1,0 +1,8 @@
+<?php
+if (!defined('ABSPATH')) { exit; }
+class RSB_Participantes {
+    public static function all(int $bolao_id): array { global $wpdb; return $wpdb->get_results($wpdb->prepare("SELECT * FROM ".rsb_table('participantes')." WHERE bolao_id=%d ORDER BY nome", $bolao_id)); }
+    public static function create(array $data): int { global $wpdb; $now=current_time('mysql'); $payload=['bolao_id'=>(int)$data['bolao_id'],'user_id'=>isset($data['user_id'])?(int)$data['user_id']:null,'nome'=>sanitize_text_field($data['nome']),'email'=>sanitize_email($data['email'] ?? ''),'telefone'=>sanitize_text_field($data['telefone'] ?? ''),'status_pagamento'=>sanitize_text_field($data['status_pagamento'] ?? 'pendente'),'valor_pago'=>(float)($data['valor_pago'] ?? 0),'data_pagamento'=>empty($data['data_pagamento'])?null:sanitize_text_field($data['data_pagamento']),'observacoes'=>sanitize_textarea_field($data['observacoes'] ?? ''),'ativo'=>isset($data['ativo'])?(int)$data['ativo']:1,'created_at'=>$now,'updated_at'=>$now]; $wpdb->insert(rsb_table('participantes'),$payload); $id=(int)$wpdb->insert_id; rsb_log('criar','participante',$id,null,$payload); return $id; }
+    public static function delete(int $id): bool { global $wpdb; $old=$wpdb->get_row($wpdb->prepare("SELECT * FROM ".rsb_table('participantes')." WHERE id=%d",$id)); $ok=false!==$wpdb->delete(rsb_table('participantes'),['id'=>$id]); if($ok){rsb_log('excluir','participante',$id,$old,null);} return $ok; }
+    public static function count_paid(int $bolao_id): int { global $wpdb; return (int)$wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM ".rsb_table('participantes')." WHERE bolao_id=%d AND status_pagamento='pago'",$bolao_id)); }
+}
