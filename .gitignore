@@ -1,0 +1,16 @@
+/dist/
+/mercado-pago-agencia-privilege.zip
+*.zip
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.pdf
+*.ico
+*.mo
+*.woff
+*.woff2
+*.ttf
+*.otf
+*.eot
