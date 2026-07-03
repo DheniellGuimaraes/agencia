@@ -1,0 +1,1028 @@
+@import url('https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;500;600;700;800;900&display=swap');
+:root{--rsb-bg:#03170e;--rsb-bg2:#072515;--rsb-glass:rgba(2,48,27,.68);--rsb-line:rgba(255,213,0,.35);--rsb-yellow:#ffd500;--rsb-green:#00c853;--rsb-white:#f8fafc;--rsb-muted:#b9c7bd;--rsb-red:#ef4444;--rsb-shadow:0 24px 70px rgba(0,0,0,.38)}
+.rsb-public,.rsb-public *{box-sizing:border-box;font-family:'Maven Pro',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important}.rsb-public{color:var(--rsb-white)}
+.rsb-app{background:radial-gradient(circle at 82% 8%,rgba(255,213,0,.22),transparent 28%),radial-gradient(circle at 22% 0%,rgba(0,200,83,.26),transparent 32%),linear-gradient(135deg,#021008,#06351d 52%,#03130b);border-radius:28px;padding:22px;box-shadow:var(--rsb-shadow);overflow:hidden;position:relative}.rsb-app:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,213,0,.07) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px);background-size:58px 58px;opacity:.25;pointer-events:none}.rsb-app>*{position:relative;z-index:1}
+.rsb-world-header{display:flex;align-items:center;gap:14px;padding:14px 18px;margin-bottom:18px;border:1px solid var(--rsb-line);border-radius:22px;background:linear-gradient(135deg,rgba(0,82,43,.78),rgba(0,34,16,.68));backdrop-filter:blur(20px);box-shadow:0 12px 35px rgba(0,0,0,.22)}.rsb-brand-mark{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#fff 0 27%,#053d21 28% 56%,var(--rsb-yellow) 57% 100%);box-shadow:0 0 0 4px rgba(255,213,0,.18),0 10px 28px rgba(0,0,0,.3)}.rsb-brand-mark span{font-size:31px}.rsb-brand-copy{display:flex;flex-direction:column;line-height:1}.rsb-brand-copy strong{font-weight:900;font-size:28px;letter-spacing:.5px}.rsb-brand-copy strong span{color:var(--rsb-yellow)}.rsb-brand-copy small{text-transform:uppercase;color:#fff;font-weight:700;font-size:12px;margin-top:5px}.rsb-top-nav{margin-left:auto;display:flex;flex-wrap:wrap;gap:10px}.rsb-top-nav a{color:#fff;text-decoration:none;padding:11px 14px;border-radius:14px;border:1px solid transparent;font-weight:700}.rsb-top-nav a:hover{border-color:var(--rsb-line);background:rgba(255,213,0,.12);color:var(--rsb-yellow)}
+.rsb-copa-hero{display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center;padding:28px;margin-bottom:18px;border:1px solid rgba(255,213,0,.35);border-radius:28px;background:linear-gradient(135deg,rgba(5,70,38,.76),rgba(0,36,18,.54)),radial-gradient(circle at right,rgba(255,213,0,.32),transparent 34%);backdrop-filter:blur(22px);box-shadow:inset 0 1px rgba(255,255,255,.14),0 20px 60px rgba(0,0,0,.28)}.rsb-kicker{display:inline-block;color:var(--rsb-yellow);text-transform:uppercase;font-weight:900;letter-spacing:.08em;margin-bottom:8px}.rsb-copa-hero h2{margin:0;color:#fff;font-size:clamp(32px,5vw,58px);line-height:1;font-weight:900;text-shadow:0 7px 24px rgba(0,0,0,.35)}.rsb-copa-hero p{max-width:790px;color:#e8fff0;font-size:17px}.rsb-hero-stats{display:flex;flex-wrap:wrap;gap:12px;margin-top:17px}.rsb-hero-stats span{min-width:105px;padding:14px 18px;border-radius:16px;border:1px solid rgba(255,213,0,.25);background:rgba(0,0,0,.18);text-align:center;text-transform:uppercase;font-size:12px}.rsb-hero-stats strong{display:block;font-size:30px;color:#fff}.rsb-host-flags{display:flex;gap:14px;align-items:center}.rsb-host-flags>span{display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:800;text-transform:uppercase;color:#fff;font-size:12px}
+.rsb-world-footer{display:grid;grid-template-columns:1.2fr auto 1fr;gap:16px;align-items:center;margin-top:20px;padding:22px;border-radius:24px;border:1px solid var(--rsb-line);background:linear-gradient(135deg,rgba(0,58,31,.82),rgba(0,22,10,.72));backdrop-filter:blur(20px)}.rsb-world-footer strong{display:block;font-size:26px;font-weight:900;color:#fff}.rsb-world-footer span,.rsb-world-footer small{color:#dfffea}.rsb-footer-flags{display:flex;gap:8px;align-items:center}
+.rsb-grid{display:grid;gap:14px}.rsb-grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}.rsb-card,.rsb-section{background:var(--rsb-glass);border:1px solid rgba(255,213,0,.26);border-radius:22px;padding:18px;margin-bottom:16px;box-shadow:inset 0 1px rgba(255,255,255,.12),0 12px 32px rgba(0,0,0,.22);backdrop-filter:blur(18px)}.rsb-card span{display:block;color:var(--rsb-muted);font-weight:700}.rsb-card strong{font-size:24px;color:#fff}.rsb-alert{border-color:rgba(239,68,68,.45)}.rsb-muted{color:var(--rsb-muted)}
+.rsb-profile-form{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end}.rsb-profile-form label{display:flex;flex-direction:column;gap:6px;color:#fff;font-weight:700}.rsb-profile-form input,.rsb-bet-form input{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:12px;color:#fff;padding:11px 12px}.rsb-profile-form input:focus,.rsb-bet-form input:focus{outline:none;border-color:var(--rsb-yellow);box-shadow:0 0 0 3px rgba(255,213,0,.15)}
+.rsb-bet-list{display:grid;gap:14px}.rsb-match-head,.rsb-match-foot{display:flex;justify-content:space-between;gap:12px;align-items:center;color:#eafff1}.rsb-match-head span:first-child{font-weight:900;color:#fff}.rsb-match-row{display:grid;grid-template-columns:1fr 74px 24px 74px 1fr;gap:12px;align-items:center;margin:14px 0}.rsb-match-row strong{display:flex;align-items:center;gap:10px;font-size:17px}.rsb-match-row strong:last-child{justify-content:flex-end}.rsb-match-row input{text-align:center;font-size:20px;font-weight:900}.rsb-badge{display:inline-flex;align-items:center;padding:8px 11px;border-radius:999px;background:rgba(255,213,0,.13);color:var(--rsb-yellow);font-weight:900;font-size:12px;text-transform:uppercase;border:1px solid rgba(255,213,0,.32)}.rsb-open{background:rgba(0,200,83,.18);color:#66ff99;border-color:rgba(0,200,83,.42)}.rsb-danger{background:rgba(239,68,68,.14);color:#ffb4b4;border-color:rgba(239,68,68,.42)}
+.rsb-flag{display:inline-grid!important;place-items:center;width:42px;height:42px;min-width:42px;border:2px solid #00ff66;border-radius:50%;background:linear-gradient(145deg,#fff,rgba(255,255,255,.72));box-shadow:0 4px 15px rgba(0,0,0,.28),0 0 0 2px rgba(0,255,102,.32),0 0 16px rgba(0,255,102,.55);font-size:25px;line-height:1;vertical-align:middle;overflow:hidden}.rsb-host-flags .rsb-flag{width:62px;height:62px;min-width:62px;font-size:38px}.rsb-footer-flags .rsb-flag{width:38px;height:38px;min-width:38px;font-size:23px}
+.rsb-public table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:18px}.rsb-public th,.rsb-public td{padding:13px;border-bottom:1px solid rgba(255,255,255,.1);text-align:left;color:#fff}.rsb-public th{color:var(--rsb-yellow);text-transform:uppercase;font-size:12px}.rsb-public .button,.rsb-public button{background:linear-gradient(135deg,var(--rsb-yellow),#ffc400);color:#06210f;border:none;border-radius:14px;padding:11px 18px;font-weight:900;cursor:pointer;text-transform:uppercase}.rsb-public .button:disabled,.rsb-public button:disabled{opacity:.45;cursor:not-allowed;background:rgba(255,255,255,.15);color:#cbd5e1}
+@media(max-width:900px){.rsb-world-header,.rsb-copa-hero,.rsb-world-footer{grid-template-columns:1fr;display:grid}.rsb-top-nav{margin-left:0}.rsb-grid-4,.rsb-profile-form{grid-template-columns:1fr}.rsb-host-flags{justify-content:flex-start}.rsb-match-row{grid-template-columns:1fr 56px 18px 56px 1fr}.rsb-app{padding:14px}.rsb-brand-copy strong{font-size:22px}}
+
+/* Mobile first access gate: on phones, the first screen stays clean with only logo + account actions. */
+.rsb-mobile-start{display:none}
+.rsb-auth-links a{color:var(--rsb-yellow);font-weight:900;text-decoration:none}
+.rsb-public .rsb-login{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,213,0,.42)}
+.rsb-public .rsb-login:hover{background:rgba(255,213,0,.13);color:var(--rsb-yellow)}
+
+@media(max-width:700px){
+  .rsb-app:not(:has(.rsb-profile-panel)) .rsb-world-header,
+  .rsb-app:not(:has(.rsb-profile-panel)) .rsb-copa-hero,
+  .rsb-app:not(:has(.rsb-profile-panel)) .rsb-login-card,
+  .rsb-app:not(:has(.rsb-profile-panel)) .rsb-world-footer{display:none!important}
+  .rsb-app:not(:has(.rsb-profile-panel)){min-height:100svh;border-radius:0;padding:28px 20px;display:grid;place-items:center;background:radial-gradient(circle at top,rgba(255,213,0,.25),transparent 28%),radial-gradient(circle at 20% 20%,rgba(0,200,83,.30),transparent 38%),linear-gradient(145deg,#020c06,#064323 56%,#021108)}
+  .rsb-mobile-start{display:flex;min-height:calc(100svh - 56px);width:100%;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:34px}
+  .rsb-mobile-logo{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;padding:22px 10px}
+  .rsb-mobile-logo .rsb-brand-mark{width:118px;height:118px;margin-bottom:8px}
+  .rsb-mobile-logo .rsb-brand-mark span{font-size:62px}
+  .rsb-mobile-logo strong{display:block;font-size:clamp(34px,10vw,48px);line-height:.92;font-weight:900;letter-spacing:.4px;color:#fff;text-shadow:0 12px 32px rgba(0,0,0,.42)}
+  .rsb-mobile-logo strong span{display:block;color:var(--rsb-yellow)}
+  .rsb-mobile-logo small{font-size:14px;color:#ecfff3;font-weight:900;text-transform:uppercase;letter-spacing:.16em}
+  .rsb-mobile-actions{width:min(100%,360px);display:grid;gap:14px}
+  .rsb-mobile-actions .button{display:flex;align-items:center;justify-content:center;width:100%;min-height:54px;border-radius:18px;text-decoration:none;font-size:15px;box-shadow:0 18px 40px rgba(0,0,0,.28)}
+}
+
+/* Mobile legacy initial home restored: centered official logo + ball + only Create Account/Login. */
+@media(max-width:700px){
+  .rsb-app.rsb-guest .rsb-world-header,
+  .rsb-app.rsb-guest .rsb-copa-hero,
+  .rsb-app.rsb-guest .rsb-login-card,
+  .rsb-app.rsb-guest .rsb-world-footer{display:none!important}
+  .rsb-app.rsb-guest{min-height:100svh;border-radius:0;padding:0;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 18%,rgba(255,213,0,.22),transparent 30%),radial-gradient(circle at 50% 62%,rgba(0,200,83,.22),transparent 38%),linear-gradient(155deg,#010b06 0%,#05351d 54%,#010904 100%)}
+  .rsb-app.rsb-guest:after{content:"";position:absolute;inset:auto -20% -10% -20%;height:48%;background:radial-gradient(ellipse at center,rgba(255,213,0,.13),transparent 58%);filter:blur(18px);pointer-events:none}
+  .rsb-app.rsb-guest .rsb-mobile-start{display:flex!important;position:relative;min-height:100svh;width:100%;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:30px;padding:34px 22px;isolation:isolate}
+  .rsb-legacy-home-bg-ball{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:min(82vw,360px);height:min(82vw,360px);border-radius:50%;background:url('https://www.resenhasagrada.com.br/wp-content/uploads/2026/06/cropped-bola.png') center/contain no-repeat;opacity:.10;filter:blur(.2px) drop-shadow(0 24px 50px rgba(0,0,0,.45));z-index:-1}
+  .rsb-app.rsb-guest .rsb-mobile-logo{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;width:100%;padding:0;background:transparent;border:0;box-shadow:none}
+  .rsb-home-logo-img{display:block;width:min(78vw,330px);height:auto;margin:0 auto;filter:drop-shadow(0 16px 32px rgba(0,0,0,.45)) drop-shadow(0 0 22px rgba(255,213,0,.18))}
+  .rsb-home-ball-img{display:block;width:min(38vw,145px);height:auto;margin:4px auto 0;filter:drop-shadow(0 16px 30px rgba(0,0,0,.48))}
+  .rsb-app.rsb-guest .rsb-mobile-logo small{display:inline-flex;align-items:center;justify-content:center;margin-top:2px;padding:8px 14px;border:1px solid rgba(255,213,0,.32);border-radius:999px;background:rgba(0,0,0,.20);backdrop-filter:blur(14px);font-size:12px;color:#f7ffe9;font-weight:900;text-transform:uppercase;letter-spacing:.18em;box-shadow:inset 0 1px rgba(255,255,255,.12)}
+  .rsb-app.rsb-guest .rsb-mobile-actions{width:min(100%,360px);display:grid;gap:13px;margin-top:4px}
+  .rsb-app.rsb-guest .rsb-mobile-actions .button{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;border-radius:18px;text-decoration:none;font-size:15px;letter-spacing:.04em;box-shadow:0 18px 42px rgba(0,0,0,.32)}
+  .rsb-app.rsb-guest .rsb-create-account{background:linear-gradient(135deg,#ffe45c,#ffd500 45%,#ffbc00);color:#032010;border:1px solid rgba(255,255,255,.18)}
+  .rsb-app.rsb-guest .rsb-login{background:rgba(4,44,24,.52);color:#fff;border:1px solid rgba(255,213,0,.44);backdrop-filter:blur(18px)}
+}
+
+/* v0.4.2 — Home mobile fiel: cadastro/login internos do plugin, fundo verde com azul/amarelo e bola animada. */
+.rsb-auth-card{display:none;max-width:520px;margin:18px auto}.rsb-auth-card.rsb-auth-visible{display:block!important}.rsb-auth-card form{display:grid;gap:12px}.rsb-auth-card label{display:flex;flex-direction:column;gap:7px;color:#fff;font-weight:800}.rsb-auth-card input{width:100%;background:rgba(255,255,255,.09);border:1px solid rgba(255,213,0,.26);border-radius:14px;color:#fff;padding:12px 13px;font-weight:700}.rsb-auth-card input:focus{outline:none;border-color:var(--rsb-yellow);box-shadow:0 0 0 3px rgba(255,213,0,.16)}
+@keyframes rsbBallFloat{0%,100%{transform:translate3d(0,0,0) rotate(-4deg) scale(1)}35%{transform:translate3d(10px,-16px,0) rotate(7deg) scale(1.035)}70%{transform:translate3d(-9px,8px,0) rotate(-9deg) scale(.985)}}
+@keyframes rsbBgShift{0%,100%{background-position:0 0,0 0,0 0}50%{background-position:24px -18px,-18px 20px,0 0}}
+@media(max-width:700px){
+  .rsb-app.rsb-guest{background:radial-gradient(circle at 18% 18%,rgba(0,102,255,.38),transparent 31%),radial-gradient(circle at 88% 14%,rgba(255,213,0,.43),transparent 27%),radial-gradient(circle at 50% 74%,rgba(0,200,83,.42),transparent 35%),linear-gradient(160deg,#013b1f 0%,#006b35 48%,#003d7a 100%)!important;background-size:115% 115%,120% 120%,120% 120%,100% 100%;animation:rsbBgShift 11s ease-in-out infinite;border-radius:0!important;}
+  .rsb-app.rsb-guest:before{opacity:.18;background:linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:42px 42px;}
+  .rsb-app.rsb-guest .rsb-mobile-start{gap:24px;transition:transform .28s ease,opacity .28s ease;}
+  .rsb-app.rsb-guest:has(.rsb-auth-visible) .rsb-mobile-start{transform:translateY(-12px) scale(.94);opacity:.92;min-height:auto;padding-top:28px;padding-bottom:10px;}
+  .rsb-app.rsb-guest:has(.rsb-auth-visible){align-content:start;place-items:center;overflow:auto;}
+  .rsb-app.rsb-guest .rsb-home-ball-img{animation:rsbBallFloat 4.6s ease-in-out infinite;transform-origin:center center;}
+  .rsb-app.rsb-guest .rsb-legacy-home-bg-ball{opacity:.13;animation:rsbBallFloat 7.5s ease-in-out infinite reverse;}
+  .rsb-app.rsb-guest .rsb-auth-card{width:calc(100% - 32px);margin:0 auto 28px;border-radius:24px;background:rgba(0,35,72,.42);border:1px solid rgba(255,213,0,.34);box-shadow:0 24px 70px rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.16);backdrop-filter:blur(24px);}
+  .rsb-app.rsb-guest .rsb-auth-card.rsb-auth-visible{display:block!important;}
+  .rsb-app.rsb-guest .rsb-login-card.rsb-auth-visible{display:block!important;}
+  .rsb-app.rsb-guest .rsb-register-card.rsb-auth-visible{display:block!important;}
+  .rsb-app.rsb-guest .rsb-auth-card h3{margin-top:0;color:#fff;font-size:24px;font-weight:900}.rsb-app.rsb-guest .rsb-auth-card p{color:#eafff1}.rsb-app.rsb-guest .rsb-auth-card input{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.28)}
+}
+
+
+/* Versão 2026.1 — Home mobile premium Copa/Futebol */
+@media(max-width:700px){
+  .rsb-app.rsb-guest{
+    background:
+      radial-gradient(circle at 50% 18%,rgba(255,229,0,.38),transparent 0 17%,transparent 36%),
+      radial-gradient(circle at 8% 16%,rgba(0,88,255,.44),transparent 0 30%,transparent 48%),
+      radial-gradient(circle at 100% 82%,rgba(255,214,0,.32),transparent 0 28%,transparent 50%),
+      linear-gradient(145deg,#003f1f 0%,#00943e 47%,#0057b8 74%,#002b69 100%)!important;
+  }
+  .rsb-app.rsb-guest:before{
+    content:"";position:absolute;inset:-20%;pointer-events:none;opacity:.25;
+    background:
+      linear-gradient(90deg,rgba(255,255,255,.18) 1px,transparent 1px),
+      linear-gradient(0deg,rgba(255,255,255,.13) 1px,transparent 1px),
+      radial-gradient(circle at center,transparent 0 56%,rgba(255,255,255,.20) 57% 58%,transparent 59%);
+    background-size:46px 46px,46px 46px,340px 340px;
+    transform:rotate(-8deg);
+  }
+  .rsb-app.rsb-guest:after{
+    content:"COPA 2026";position:absolute;left:50%;top:7%;transform:translateX(-50%);z-index:0;
+    color:rgba(255,255,255,.10);font-weight:900;font-size:clamp(58px,18vw,108px);letter-spacing:-.06em;white-space:nowrap;
+  }
+  .rsb-mobile-start{position:relative;z-index:2;gap:22px!important;padding:34px 18px!important;justify-content:center!important;}
+  .rsb-mobile-logo{
+    width:min(100%,390px);position:relative;padding:28px 22px 22px!important;border-radius:34px;
+    background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.06));
+    border:1px solid rgba(255,255,255,.28);box-shadow:0 30px 90px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.24);
+    backdrop-filter:blur(20px);
+  }
+  .rsb-home-logo-img{width:min(84vw,292px)!important;filter:drop-shadow(0 18px 28px rgba(0,0,0,.42));}
+  .rsb-home-ball-img{width:min(52vw,210px)!important;margin-top:8px;filter:drop-shadow(0 28px 36px rgba(0,0,0,.42));animation:rsbFloatBall 4s ease-in-out infinite,rsbSpinBall 12s linear infinite;}
+  .rsb-mobile-cup-tag{display:inline-flex;align-items:center;justify-content:center;margin-top:8px;padding:9px 13px;border-radius:999px;background:rgba(255,213,0,.18);border:1px solid rgba(255,213,0,.38);font-style:normal;color:#fff;font-weight:900;text-transform:uppercase;font-size:11px;letter-spacing:.05em;box-shadow:0 12px 28px rgba(0,0,0,.18)}
+  .rsb-mobile-actions{position:relative;z-index:3;width:min(100%,390px)!important;gap:12px!important;}
+  .rsb-mobile-actions .button{min-height:58px!important;border-radius:20px!important;font-size:16px!important;letter-spacing:.04em;border:1px solid rgba(255,255,255,.20)!important;}
+  .rsb-mobile-actions .rsb-create-account{background:linear-gradient(135deg,#ffea00,#ffb800)!important;color:#06320f!important;box-shadow:0 20px 48px rgba(255,213,0,.30)!important;}
+  .rsb-mobile-actions .rsb-login{background:linear-gradient(135deg,rgba(0,97,255,.62),rgba(0,60,150,.42))!important;color:#fff!important;border-color:rgba(255,255,255,.34)!important;box-shadow:0 20px 48px rgba(0,61,180,.22)!important;}
+  .rsb-legacy-home-bg-ball{display:block!important;position:absolute;right:-90px;bottom:-90px;width:260px;height:260px;border-radius:50%;opacity:.15;background:radial-gradient(circle,#fff 0 8%,transparent 9%),conic-gradient(from 45deg,#fff 0 10%,transparent 10% 20%,#fff 20% 30%,transparent 30% 40%,#fff 40% 50%,transparent 50% 60%,#fff 60% 70%,transparent 70% 80%,#fff 80% 90%,transparent 90%);animation:rsbBgBall 18s linear infinite;}
+}
+@keyframes rsbFloatBall{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-16px) rotate(3deg)}}
+@keyframes rsbSpinBall{0%{rotate:0deg}100%{rotate:360deg}}
+@keyframes rsbBgBall{0%{transform:rotate(0deg) scale(1)}100%{transform:rotate(360deg) scale(1.06)}}
+
+
+/* Versão 2026.2 — Home pública desktop SaaS Copa 2026
+   Mantém o fluxo interno do plugin: Criar conta / Entrar sem wp-admin. */
+@media(min-width:701px){
+  .rsb-app.rsb-guest{
+    position:relative;
+    min-height:100vh;
+    margin:0;
+    padding:0;
+    border-radius:0;
+    overflow:hidden;
+    display:grid;
+    place-items:center;
+    isolation:isolate;
+    font-family:'Maven Pro',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important;
+    background:
+      radial-gradient(circle at 14% 14%,rgba(0,94,255,.42),transparent 0 28%,transparent 52%),
+      radial-gradient(circle at 78% 12%,rgba(255,221,0,.45),transparent 0 24%,transparent 44%),
+      radial-gradient(circle at 62% 88%,rgba(0,214,90,.36),transparent 0 28%,transparent 50%),
+      linear-gradient(135deg,#001a10 0%,#004d25 42%,#002f67 72%,#020817 100%)!important;
+  }
+  .rsb-app.rsb-guest:before{
+    content:"";
+    position:absolute;
+    inset:-18%;
+    z-index:-3;
+    opacity:.30;
+    background:
+      linear-gradient(90deg,rgba(255,255,255,.14) 1px,transparent 1px),
+      linear-gradient(0deg,rgba(255,255,255,.10) 1px,transparent 1px),
+      radial-gradient(circle at center,transparent 0 62%,rgba(255,255,255,.20) 63% 64%,transparent 65%);
+    background-size:58px 58px,58px 58px,460px 460px;
+    transform:rotate(-8deg);
+    animation:rsbSaasGrid 18s ease-in-out infinite;
+  }
+  .rsb-app.rsb-guest:after{
+    content:"COPA 2026";
+    position:absolute;
+    left:50%;
+    top:8%;
+    z-index:-2;
+    transform:translateX(-50%);
+    color:rgba(255,255,255,.075);
+    font-size:clamp(92px,13vw,210px);
+    font-weight:900;
+    line-height:.8;
+    letter-spacing:-.08em;
+    white-space:nowrap;
+    pointer-events:none;
+    text-shadow:0 28px 90px rgba(0,0,0,.22);
+  }
+  .rsb-app.rsb-guest .rsb-world-header,
+  .rsb-app.rsb-guest .rsb-copa-hero,
+  .rsb-app.rsb-guest .rsb-world-footer{
+    display:none!important;
+  }
+  .rsb-app.rsb-guest .rsb-mobile-start{
+    display:grid!important;
+    grid-template-columns:minmax(360px,520px) minmax(360px,520px);
+    align-items:center;
+    justify-content:center;
+    width:min(1180px,calc(100vw - 72px));
+    min-height:auto;
+    gap:34px;
+    padding:42px;
+    border-radius:42px;
+    position:relative;
+    z-index:2;
+    background:linear-gradient(145deg,rgba(255,255,255,.17),rgba(255,255,255,.055));
+    border:1px solid rgba(255,255,255,.22);
+    box-shadow:0 34px 110px rgba(0,0,0,.48), inset 0 1px rgba(255,255,255,.22);
+    backdrop-filter:blur(26px) saturate(130%);
+  }
+  .rsb-app.rsb-guest .rsb-mobile-start:before{
+    content:"";
+    position:absolute;
+    inset:14px;
+    border-radius:32px;
+    border:1px solid rgba(255,221,0,.24);
+    pointer-events:none;
+    box-shadow:inset 0 0 65px rgba(0,255,120,.08),0 0 45px rgba(255,221,0,.09);
+  }
+  .rsb-app.rsb-guest .rsb-mobile-logo{
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    flex-direction:column;
+    gap:18px;
+    width:100%;
+    min-height:520px;
+    padding:26px 10px;
+    background:transparent;
+    border:0;
+    box-shadow:none;
+    text-align:left;
+  }
+  .rsb-app.rsb-guest .rsb-mobile-logo:before{
+    content:"⚽ Bolão oficial da resenha";
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 14px;
+    border-radius:999px;
+    background:rgba(0,0,0,.22);
+    border:1px solid rgba(255,221,0,.34);
+    color:#fff7b0;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    box-shadow:inset 0 1px rgba(255,255,255,.16);
+  }
+  .rsb-app.rsb-guest .rsb-home-logo-img{
+    display:block;
+    width:min(410px,38vw);
+    max-width:100%;
+    height:auto;
+    margin:0;
+    filter:drop-shadow(0 22px 35px rgba(0,0,0,.42)) drop-shadow(0 0 28px rgba(255,221,0,.22));
+  }
+  .rsb-app.rsb-guest .rsb-mobile-logo small{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    margin:2px 0 0;
+    padding:9px 15px;
+    border:1px solid rgba(255,221,0,.38);
+    border-radius:999px;
+    background:rgba(0,0,0,.22);
+    color:#f8fff4;
+    font-size:12px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.18em;
+    box-shadow:inset 0 1px rgba(255,255,255,.14);
+  }
+  .rsb-app.rsb-guest .rsb-mobile-cup-tag{
+    display:inline-flex;
+    margin-top:0;
+    padding:10px 15px;
+    border-radius:999px;
+    background:linear-gradient(135deg,rgba(255,221,0,.24),rgba(0,176,80,.16));
+    border:1px solid rgba(255,221,0,.38);
+    color:#fff;
+    font-style:normal;
+    font-size:12px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+  }
+  .rsb-app.rsb-guest .rsb-home-ball-img{
+    position:absolute;
+    right:62px;
+    top:50%;
+    z-index:2;
+    width:min(330px,28vw)!important;
+    height:auto;
+    margin:0;
+    transform:translateY(-50%);
+    filter:drop-shadow(0 36px 58px rgba(0,0,0,.54)) drop-shadow(0 0 35px rgba(255,221,0,.24));
+    animation:rsbDesktopBallFloat 5.2s ease-in-out infinite;
+  }
+  .rsb-app.rsb-guest .rsb-legacy-home-bg-ball{
+    display:block!important;
+    position:absolute;
+    right:-120px;
+    bottom:-135px;
+    width:420px;
+    height:420px;
+    z-index:-1;
+    border-radius:50%;
+    opacity:.11;
+    background:url('https://www.resenhasagrada.com.br/wp-content/uploads/2026/06/cropped-bola.png') center/contain no-repeat;
+    filter:blur(.2px) drop-shadow(0 30px 80px rgba(0,0,0,.48));
+    animation:rsbBgBall 22s linear infinite;
+  }
+  .rsb-app.rsb-guest .rsb-mobile-actions{
+    align-self:end;
+    justify-self:start;
+    width:min(430px,100%);
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-top:-118px;
+    z-index:4;
+  }
+  .rsb-app.rsb-guest .rsb-mobile-actions:before{
+    content:"Entre no campeonato, faça seus palpites e acompanhe o ranking em tempo real.";
+    grid-column:1/-1;
+    color:rgba(255,255,255,.84);
+    font-size:17px;
+    line-height:1.55;
+    font-weight:700;
+    text-shadow:0 2px 18px rgba(0,0,0,.28);
+    margin-bottom:6px;
+  }
+  .rsb-app.rsb-guest .rsb-mobile-actions .button{
+    min-height:58px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    font-size:15px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    border:1px solid rgba(255,255,255,.20);
+    box-shadow:0 20px 54px rgba(0,0,0,.34);
+  }
+  .rsb-app.rsb-guest .rsb-mobile-actions .rsb-create-account{
+    background:linear-gradient(135deg,#fff06a 0%,#ffd000 48%,#ffab00 100%)!important;
+    color:#042514!important;
+  }
+  .rsb-app.rsb-guest .rsb-mobile-actions .rsb-login{
+    background:linear-gradient(135deg,rgba(0,91,255,.64),rgba(0,58,150,.46))!important;
+    color:#fff!important;
+    border-color:rgba(255,255,255,.36)!important;
+    backdrop-filter:blur(16px);
+  }
+  .rsb-app.rsb-guest .rsb-auth-card{
+    position:fixed;
+    right:clamp(28px,5vw,82px);
+    top:50%;
+    transform:translateY(-50%) translateX(18px);
+    z-index:20;
+    width:min(430px,calc(100vw - 56px));
+    max-height:calc(100vh - 64px);
+    overflow:auto;
+    margin:0;
+    padding:26px;
+    border-radius:28px;
+    background:linear-gradient(145deg,rgba(0,41,29,.72),rgba(0,34,85,.54));
+    border:1px solid rgba(255,221,0,.34);
+    box-shadow:0 34px 110px rgba(0,0,0,.58),inset 0 1px rgba(255,255,255,.18);
+    backdrop-filter:blur(26px) saturate(138%);
+  }
+  .rsb-app.rsb-guest .rsb-auth-card.rsb-auth-visible{
+    display:block!important;
+    animation:rsbAuthPanelIn .28s ease forwards;
+  }
+  .rsb-app.rsb-guest .rsb-auth-card h3{
+    margin-top:0;
+    color:#fff;
+    font-size:26px;
+    font-weight:900;
+  }
+  .rsb-app.rsb-guest .rsb-auth-card p{color:#eafff2;line-height:1.55;}
+  .rsb-app.rsb-guest .rsb-auth-card label{color:#fff;font-weight:900;}
+  .rsb-app.rsb-guest .rsb-auth-card input{
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.25);
+    color:#fff;
+  }
+}
+@media(min-width:701px) and (max-width:980px){
+  .rsb-app.rsb-guest .rsb-mobile-start{
+    grid-template-columns:1fr;
+    width:min(720px,calc(100vw - 36px));
+    padding:34px;
+  }
+  .rsb-app.rsb-guest .rsb-mobile-logo{min-height:430px;align-items:center;text-align:center;}
+  .rsb-app.rsb-guest .rsb-home-logo-img{width:min(420px,72vw);}
+  .rsb-app.rsb-guest .rsb-home-ball-img{position:relative;right:auto;top:auto;transform:none;width:min(240px,42vw)!important;}
+  .rsb-app.rsb-guest .rsb-mobile-actions{margin-top:0;justify-self:center;}
+}
+@keyframes rsbDesktopBallFloat{0%,100%{transform:translateY(-50%) translateX(0) rotate(-3deg) scale(1)}50%{transform:translateY(calc(-50% - 18px)) translateX(-10px) rotate(5deg) scale(1.035)}}
+@keyframes rsbAuthPanelIn{from{opacity:0;transform:translateY(-50%) translateX(24px) scale(.98)}to{opacity:1;transform:translateY(-50%) translateX(0) scale(1)}}
+@keyframes rsbSaasGrid{0%,100%{transform:rotate(-8deg) translate3d(0,0,0)}50%{transform:rotate(-8deg) translate3d(24px,-20px,0)}}
+
+
+/* Versão 2026.3 — Responsividade final e correção da home pública.
+   Home visitante: somente logo, bola, background Copa/Brasil e ações internas do plugin. */
+.rsb-public img{max-width:100%;height:auto}.rsb-public table{width:100%;border-collapse:collapse}.rsb-public .rsb-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}.rsb-public input,.rsb-public select,.rsb-public button,.rsb-public .button{max-width:100%}
+.rsb-app.rsb-guest .rsb-mobile-logo small,.rsb-app.rsb-guest .rsb-mobile-cup-tag,.rsb-app.rsb-guest .rsb-mobile-logo:before,.rsb-app.rsb-guest .rsb-mobile-actions:before{display:none!important}
+.rsb-app.rsb-guest .rsb-world-header,.rsb-app.rsb-guest .rsb-copa-hero,.rsb-app.rsb-guest .rsb-world-footer{display:none!important}
+.rsb-app.rsb-guest{min-height:100svh!important;border-radius:0!important;margin:0!important;display:grid!important;place-items:center!important;padding:clamp(18px,4vw,46px)!important;background:radial-gradient(circle at 16% 16%,rgba(0,87,183,.52),transparent 0 28%,transparent 48%),radial-gradient(circle at 84% 18%,rgba(255,223,0,.48),transparent 0 26%,transparent 48%),radial-gradient(circle at 50% 92%,rgba(0,156,59,.52),transparent 0 34%,transparent 56%),linear-gradient(145deg,#001b10 0%,#006b2f 42%,#0047a0 74%,#020817 100%)!important;overflow:hidden!important;isolation:isolate}.rsb-app.rsb-guest:before{content:""!important;position:absolute!important;inset:-18%!important;z-index:0!important;opacity:.28!important;background:linear-gradient(90deg,rgba(255,255,255,.16) 1px,transparent 1px),linear-gradient(0deg,rgba(255,255,255,.11) 1px,transparent 1px),radial-gradient(circle at center,transparent 0 61%,rgba(255,255,255,.20) 62% 63%,transparent 64%)!important;background-size:54px 54px,54px 54px,430px 430px!important;transform:rotate(-8deg);animation:rsbSaasGrid 18s ease-in-out infinite!important}.rsb-app.rsb-guest:after{content:""!important;position:absolute!important;inset:0!important;z-index:0!important;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.10),transparent 0 26%,transparent 47%),linear-gradient(135deg,rgba(255,221,0,.10),transparent 42%,rgba(0,87,183,.12))!important;pointer-events:none!important}.rsb-app.rsb-guest>*{z-index:1!important}
+.rsb-app.rsb-guest .rsb-mobile-start{display:grid!important;grid-template-columns:1fr!important;place-items:center!important;width:min(520px,100%)!important;min-height:auto!important;padding:clamp(22px,4vw,42px)!important;gap:clamp(18px,3vw,28px)!important;border-radius:clamp(28px,4vw,44px)!important;background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.06))!important;border:1px solid rgba(255,255,255,.24)!important;box-shadow:0 34px 110px rgba(0,0,0,.48),inset 0 1px rgba(255,255,255,.24)!important;backdrop-filter:blur(26px) saturate(135%)!important;text-align:center!important}.rsb-app.rsb-guest .rsb-mobile-start:before{content:""!important;position:absolute!important;inset:12px!important;border-radius:calc(clamp(28px,4vw,44px) - 10px)!important;border:1px solid rgba(255,221,0,.28)!important;box-shadow:inset 0 0 64px rgba(0,255,120,.08),0 0 46px rgba(255,221,0,.10)!important;pointer-events:none!important}.rsb-app.rsb-guest .rsb-mobile-logo{display:grid!important;place-items:center!important;width:100%!important;min-height:0!important;padding:0!important;margin:0!important;gap:18px!important;background:transparent!important;border:0!important;box-shadow:none!important;text-align:center!important}.rsb-app.rsb-guest .rsb-home-logo-img{width:min(360px,82vw)!important;margin:0 auto!important;filter:drop-shadow(0 22px 34px rgba(0,0,0,.48)) drop-shadow(0 0 28px rgba(255,221,0,.24))!important}.rsb-app.rsb-guest .rsb-home-ball-img{position:relative!important;right:auto!important;top:auto!important;transform:none!important;width:min(230px,52vw)!important;margin:0 auto!important;filter:drop-shadow(0 30px 42px rgba(0,0,0,.52)) drop-shadow(0 0 32px rgba(255,221,0,.24))!important;animation:rsbFloatBall 4.2s ease-in-out infinite,rsbSpinBall 16s linear infinite!important}.rsb-app.rsb-guest .rsb-legacy-home-bg-ball{display:block!important;position:absolute!important;right:-110px!important;bottom:-120px!important;width:360px!important;height:360px!important;opacity:.12!important;background:url('https://www.resenhasagrada.com.br/wp-content/uploads/2026/06/cropped-bola.png') center/contain no-repeat!important;animation:rsbBgBall 22s linear infinite!important;z-index:-1!important}.rsb-app.rsb-guest .rsb-mobile-actions{display:grid!important;grid-template-columns:1fr 1fr!important;width:min(410px,100%)!important;gap:14px!important;margin:0!important;justify-self:center!important;align-self:center!important}.rsb-app.rsb-guest .rsb-mobile-actions .button{display:flex!important;align-items:center!important;justify-content:center!important;min-height:58px!important;padding:0 18px!important;border-radius:18px!important;text-decoration:none!important;font-size:15px!important;font-weight:900!important;text-transform:uppercase!important;letter-spacing:.05em!important;box-shadow:0 20px 54px rgba(0,0,0,.34)!important}.rsb-app.rsb-guest .rsb-mobile-actions .rsb-create-account{background:linear-gradient(135deg,#fff06a 0%,#ffd000 48%,#ffab00 100%)!important;color:#042514!important;border:1px solid rgba(255,255,255,.28)!important}.rsb-app.rsb-guest .rsb-mobile-actions .rsb-login{background:linear-gradient(135deg,rgba(0,91,255,.68),rgba(0,58,150,.48))!important;color:#fff!important;border:1px solid rgba(255,255,255,.36)!important;backdrop-filter:blur(16px)!important}.rsb-app.rsb-guest .rsb-auth-card{position:fixed!important;left:50%!important;right:auto!important;top:50%!important;transform:translate(-50%,-50%)!important;width:min(460px,calc(100vw - 32px))!important;max-height:calc(100svh - 32px)!important;overflow:auto!important;margin:0!important;padding:clamp(20px,4vw,28px)!important;border-radius:28px!important;background:linear-gradient(145deg,rgba(0,41,29,.78),rgba(0,34,85,.62))!important;border:1px solid rgba(255,221,0,.36)!important;box-shadow:0 34px 110px rgba(0,0,0,.62),inset 0 1px rgba(255,255,255,.18)!important;backdrop-filter:blur(26px) saturate(138%)!important}.rsb-app.rsb-guest .rsb-auth-card:not(.rsb-auth-visible){display:none!important}.rsb-app.rsb-guest .rsb-auth-card.rsb-auth-visible{display:block!important;animation:none!important}
+@media(max-width:700px){.rsb-app.rsb-guest{padding:18px!important}.rsb-app.rsb-guest .rsb-mobile-start{width:100%!important;max-width:390px!important;min-height:auto!important}.rsb-app.rsb-guest .rsb-home-logo-img{width:min(300px,82vw)!important}.rsb-app.rsb-guest .rsb-home-ball-img{width:min(190px,52vw)!important}.rsb-app.rsb-guest .rsb-mobile-actions{grid-template-columns:1fr!important}.rsb-app.rsb-guest:has(.rsb-auth-visible) .rsb-mobile-start{opacity:.28!important;filter:blur(2px)!important;transform:scale(.98)!important}.rsb-app.rsb-guest .rsb-auth-card{width:calc(100vw - 28px)!important;max-height:calc(100svh - 28px)!important}.rsb-public .rsb-world-header{flex-direction:column;align-items:stretch}.rsb-public .rsb-top-nav{display:flex;overflow-x:auto;flex-wrap:nowrap;margin-left:0;padding-bottom:6px}.rsb-public .rsb-top-nav a{white-space:nowrap}.rsb-public .rsb-copa-hero{grid-template-columns:1fr!important;padding:20px!important}.rsb-public .rsb-hero-stats{grid-template-columns:repeat(2,1fr)!important}.rsb-public .rsb-grid,.rsb-public .rsb-grid-4{grid-template-columns:1fr!important}.rsb-public .rsb-profile-form,.rsb-public .rsb-bet-form{grid-template-columns:1fr!important}.rsb-public .rsb-card{padding:16px!important}.rsb-public table{font-size:13px}.rsb-public th,.rsb-public td{white-space:nowrap}}
+@media(min-width:701px) and (max-width:1100px){.rsb-public .rsb-world-header{flex-wrap:wrap}.rsb-public .rsb-top-nav{margin-left:0;width:100%;overflow-x:auto;flex-wrap:nowrap}.rsb-public .rsb-copa-hero{grid-template-columns:1fr}.rsb-public .rsb-grid-4{grid-template-columns:repeat(2,minmax(0,1fr))!important}.rsb-public .rsb-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.rsb-app.rsb-guest .rsb-mobile-start{max-width:520px!important}}
+
+
+/* Versão 2026.4 — correção real do mobile pós-login e cards de confrontos completos.
+   Não altera regras nem fluxo; apenas responsividade visual e contenção de overflow. */
+html:has(.rsb-public), body:has(.rsb-public){overflow-x:hidden!important;}
+.rsb-public{width:100%;max-width:100%;overflow-x:hidden;}
+.rsb-public .rsb-section,.rsb-public .rsb-card{max-width:100%;}
+.rsb-public .rsb-bet-form{overflow:hidden;}
+.rsb-public .rsb-match-head > *, .rsb-public .rsb-match-row > *{min-width:0;}
+
+@media(max-width:700px){
+  .rsb-public:not(.rsb-app), .rsb-public.rsb-section{padding-left:10px!important;padding-right:10px!important;}
+  .rsb-app:not(.rsb-guest){
+    width:100%!important;max-width:100vw!important;margin:0!important;padding:10px!important;border-radius:0!important;
+    overflow-x:hidden!important;background:radial-gradient(circle at 15% 0%,rgba(255,213,0,.22),transparent 28%),radial-gradient(circle at 90% 10%,rgba(0,87,183,.18),transparent 34%),linear-gradient(160deg,#03170e 0%,#06371f 54%,#041c12 100%)!important;
+  }
+  .rsb-public .rsb-section{border-radius:18px!important;padding:12px!important;margin:0 0 12px!important;overflow:hidden!important;}
+  .rsb-public .rsb-section h3{font-size:20px!important;line-height:1.08!important;margin:0 0 8px!important;}
+  .rsb-public .rsb-section p{font-size:13px!important;line-height:1.35!important;}
+  .rsb-bet-list{gap:10px!important;}
+  .rsb-public .rsb-bet-form.rsb-card{padding:12px!important;border-radius:20px!important;margin-bottom:10px!important;background:linear-gradient(145deg,rgba(2,50,29,.88),rgba(2,35,24,.72))!important;border-color:rgba(255,213,0,.22)!important;box-shadow:0 14px 34px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.10)!important;}
+  .rsb-match-head{display:grid!important;grid-template-columns:1fr!important;gap:3px!important;align-items:start!important;}
+  .rsb-match-head span:first-child{font-size:14px!important;line-height:1.15!important;white-space:normal!important;overflow:visible!important;}
+  .rsb-match-head span:last-child,.rsb-match-head small{font-size:11px!important;line-height:1.2!important;color:#d6f8df!important;white-space:normal!important;overflow-wrap:anywhere!important;}
+  .rsb-match-row{display:grid!important;grid-template-columns:minmax(0,1fr) 48px 14px 48px minmax(0,1fr)!important;gap:7px!important;align-items:center!important;margin:12px 0!important;width:100%!important;}
+  .rsb-match-row strong{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:5px!important;text-align:center!important;font-size:12px!important;line-height:1.05!important;font-weight:900!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;}
+  .rsb-match-row strong:last-child{justify-content:flex-start!important;}
+  .rsb-match-row .rsb-flag{width:34px!important;height:34px!important;min-width:34px!important;border-color:#00ff66!important;font-size:20px!important;box-shadow:0 3px 10px rgba(0,0,0,.28),0 0 0 2px rgba(0,255,102,.32),0 0 14px rgba(0,255,102,.5)!important;}
+  .rsb-match-row span:not(.rsb-flag){font-size:17px!important;font-weight:900!important;color:#dfffea!important;text-align:center!important;}
+  .rsb-match-row input{width:48px!important;min-width:48px!important;height:46px!important;padding:4px!important;border-radius:10px!important;font-size:20px!important;text-align:center!important;background:rgba(255,255,255,.10)!important;border:1px solid rgba(255,255,255,.28)!important;}
+  .rsb-match-foot{display:grid!important;grid-template-columns:1fr!important;gap:9px!important;align-items:stretch!important;}
+  .rsb-match-foot .rsb-badge{justify-content:center!important;width:100%!important;min-height:36px!important;font-size:11px!important;padding:8px 10px!important;}
+  .rsb-match-foot .button,.rsb-match-foot button{width:100%!important;min-height:46px!important;border-radius:14px!important;font-size:13px!important;padding:10px 12px!important;}
+  .rsb-public .rsb-world-header{border-radius:0 0 18px 18px!important;margin:-10px -10px 12px!important;padding:10px!important;}
+  .rsb-brand-mark{width:46px!important;height:46px!important;min-width:46px!important;}.rsb-brand-mark span{font-size:24px!important;}
+  .rsb-brand-copy strong{font-size:20px!important;}.rsb-brand-copy small{font-size:10px!important;}
+  .rsb-public .rsb-top-nav{gap:6px!important;scroll-snap-type:x proximity!important;}
+  .rsb-public .rsb-top-nav a{font-size:12px!important;padding:9px 10px!important;border-radius:12px!important;scroll-snap-align:start!important;}
+  .rsb-public .rsb-copa-hero{border-radius:20px!important;margin-bottom:12px!important;padding:16px!important;}
+  .rsb-public .rsb-copa-hero h2{font-size:30px!important;}.rsb-public .rsb-copa-hero p{font-size:13px!important;}
+  .rsb-hero-stats{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;}.rsb-hero-stats span{min-width:0!important;padding:10px!important;}.rsb-hero-stats strong{font-size:24px!important;}
+}
+
+@media(max-width:390px){
+  .rsb-match-row{grid-template-columns:minmax(0,1fr) 42px 12px 42px minmax(0,1fr)!important;gap:5px!important;}
+  .rsb-match-row input{width:42px!important;min-width:42px!important;height:42px!important;font-size:18px!important;}
+  .rsb-match-row strong{font-size:11px!important;}
+  .rsb-match-row .rsb-flag{width:30px!important;height:30px!important;min-width:30px!important;font-size:18px!important;}
+}
+
+/* Versao 2026.7 - icones centralizados, tabelas responsivas e confrontos sem corte. */
+.rsb-flag-placeholder{background:linear-gradient(145deg,#ffd500,#0f5f32)!important;color:#052312!important;font-size:20px!important}
+.rsb-flag-initials{background:linear-gradient(145deg,#ffffff,#dfffea)!important;color:#07351f!important;font-size:12px!important;font-weight:900!important}
+.rsb-team-side span,.rsb-team-pill span{min-width:0;overflow-wrap:anywhere;word-break:normal}
+.rsb-table-match{display:flex;align-items:center;gap:9px;min-width:260px;max-width:100%}
+.rsb-team-pill{display:inline-flex;align-items:center;gap:8px;min-width:0;max-width:260px;font-weight:800;color:#fff}
+.rsb-team-pill .rsb-flag{width:32px;height:32px;min-width:32px;font-size:18px}
+.rsb-public .rsb-table-wrap{width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;border-radius:18px}
+.rsb-public .rsb-table-wrap table{min-width:720px}
+.rsb-public td{vertical-align:middle}
+@media(max-width:700px){
+  .rsb-table-match{min-width:230px;gap:7px}
+  .rsb-team-pill{max-width:170px;font-size:12px;line-height:1.1}
+  .rsb-team-pill .rsb-flag{width:28px!important;height:28px!important;min-width:28px!important;font-size:16px!important}
+  .rsb-public .rsb-table-wrap{margin:0 -2px}
+  .rsb-public .rsb-table-wrap table{min-width:640px}
+}
+.rsb-top-nav .rsb-logout-link{display:inline-flex;align-items:center;gap:8px;border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.08)}
+.rsb-top-nav .rsb-logout-link:hover{background:rgba(239,68,68,.16);border-color:rgba(239,68,68,.42);color:#fff}
+.rsb-logout-icon{position:relative;display:inline-block;width:18px;height:18px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;flex:0 0 18px}
+.rsb-logout-icon:before{content:"";position:absolute;left:50%;top:-5px;width:2px;height:11px;transform:translateX(-50%);border-radius:999px;background:currentColor}
+
+/* Versao 2026.7 - header logado com logo central, glassmorphism ultra e faixas Brasil/Copa. */
+.rsb-app.rsb-auth .rsb-world-header{
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  justify-items:center!important;
+  align-items:center!important;
+  gap:18px!important;
+  min-height:194px!important;
+  margin:0 0 20px!important;
+  padding:26px clamp(14px,3vw,34px) 20px!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+  border-radius:30px!important;
+  border:1px solid rgba(255,255,255,.24)!important;
+  background:linear-gradient(135deg,rgba(0,35,22,.90),rgba(0,44,92,.76) 54%,rgba(2,20,35,.86))!important;
+  box-shadow:0 28px 90px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.22),inset 0 -1px rgba(255,213,0,.18)!important;
+  backdrop-filter:blur(30px) saturate(150%)!important;
+}
+.rsb-app.rsb-auth .rsb-world-header:before{
+  content:"";
+  position:absolute;
+  inset:-42% -18%;
+  z-index:-2;
+  background:
+    linear-gradient(118deg,transparent 0 14%,rgba(0,156,59,.00) 15%,rgba(0,156,59,.82) 21%,rgba(0,156,59,.16) 30%,transparent 39%),
+    linear-gradient(63deg,transparent 0 24%,rgba(255,213,0,.88) 30%,rgba(255,213,0,.18) 39%,transparent 49%),
+    linear-gradient(132deg,transparent 0 38%,rgba(0,87,183,.84) 46%,rgba(0,87,183,.20) 57%,transparent 68%),
+    linear-gradient(96deg,transparent 0 54%,rgba(255,255,255,.22) 60%,transparent 67%);
+  opacity:.92;
+  transform:skewY(-4deg) scale(1.04);
+  filter:saturate(128%) contrast(110%);
+}
+.rsb-app.rsb-auth .rsb-world-header:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px),
+    linear-gradient(0deg,rgba(255,255,255,.055) 1px,transparent 1px),
+    linear-gradient(180deg,rgba(1,11,18,.06),rgba(1,11,18,.58));
+  background-size:44px 44px,44px 44px,100% 100%;
+  opacity:.76;
+}
+.rsb-header-logo{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:min(100%,460px)!important;
+  min-height:86px!important;
+  padding:14px 22px!important;
+  border-radius:26px!important;
+  text-decoration:none!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.20),rgba(255,255,255,.07))!important;
+  border:1px solid rgba(255,255,255,.30)!important;
+  box-shadow:0 20px 58px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.28),inset 0 -1px rgba(255,213,0,.15)!important;
+  backdrop-filter:blur(22px) saturate(140%)!important;
+}
+.rsb-header-logo img{
+  display:block!important;
+  width:min(360px,78vw)!important;
+  max-height:104px!important;
+  object-fit:contain!important;
+  filter:drop-shadow(0 16px 28px rgba(0,0,0,.40)) drop-shadow(0 0 18px rgba(255,213,0,.22))!important;
+}
+.rsb-app.rsb-auth .rsb-top-nav{
+  width:min(100%,1080px)!important;
+  margin:0!important;
+  display:grid!important;
+  grid-template-columns:repeat(6,minmax(116px,1fr))!important;
+  gap:12px!important;
+  align-items:stretch!important;
+  justify-content:center!important;
+}
+.rsb-app.rsb-auth .rsb-top-nav .rsb-nav-item{
+  position:relative!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:9px!important;
+  min-height:56px!important;
+  padding:11px 13px!important;
+  overflow:hidden!important;
+  border-radius:18px!important;
+  color:#fff!important;
+  text-decoration:none!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  line-height:1.05!important;
+  text-align:center!important;
+  text-transform:none!important;
+  border:1px solid rgba(255,255,255,.22)!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.17),rgba(255,255,255,.055))!important;
+  box-shadow:0 16px 42px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.23),inset 0 -1px rgba(255,255,255,.08)!important;
+  backdrop-filter:blur(20px) saturate(145%)!important;
+}
+.rsb-app.rsb-auth .rsb-top-nav .rsb-nav-item:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:.58;
+  background:linear-gradient(120deg,transparent 0 18%,var(--rsb-nav-accent,rgba(255,213,0,.45)) 45%,transparent 72%);
+  transform:translateX(-65%);
+  transition:transform .28s ease,opacity .28s ease;
+}
+.rsb-app.rsb-auth .rsb-top-nav .rsb-nav-item:hover:before{transform:translateX(18%);opacity:.82}
+.rsb-app.rsb-auth .rsb-top-nav .rsb-nav-item:hover{
+  transform:translateY(-1px);
+  border-color:rgba(255,255,255,.38)!important;
+  box-shadow:0 20px 56px rgba(0,0,0,.34),0 0 28px var(--rsb-nav-glow,rgba(255,213,0,.18)),inset 0 1px rgba(255,255,255,.30)!important;
+}
+.rsb-app.rsb-auth .rsb-top-nav .rsb-nav-item>span{position:relative;z-index:1}
+.rsb-app.rsb-auth .rsb-nav-icon{
+  display:grid!important;
+  place-items:center!important;
+  width:34px!important;
+  height:34px!important;
+  min-width:34px!important;
+  border-radius:14px!important;
+  color:#041713!important;
+  font-weight:900!important;
+  background:linear-gradient(145deg,#fff,#dfffea)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.70),0 10px 22px rgba(0,0,0,.24)!important;
+}
+.rsb-app.rsb-auth .rsb-nav-icon svg{
+  display:block!important;
+  width:21px!important;
+  height:21px!important;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.9!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.45))!important;
+}
+.rsb-nav-palpites{--rsb-nav-accent:rgba(0,87,183,.56);--rsb-nav-glow:rgba(0,87,183,.24)}
+.rsb-nav-meus{--rsb-nav-accent:rgba(255,213,0,.58);--rsb-nav-glow:rgba(255,213,0,.22)}
+.rsb-nav-ranking{--rsb-nav-accent:rgba(255,183,0,.64);--rsb-nav-glow:rgba(255,183,0,.26)}
+.rsb-nav-premiacao{--rsb-nav-accent:rgba(0,156,59,.62);--rsb-nav-glow:rgba(0,156,59,.25)}
+.rsb-nav-regras{--rsb-nav-accent:rgba(255,255,255,.46);--rsb-nav-glow:rgba(255,255,255,.18)}
+.rsb-app.rsb-auth .rsb-top-nav .rsb-logout-link{--rsb-nav-accent:rgba(239,68,68,.54);--rsb-nav-glow:rgba(239,68,68,.22)}
+.rsb-app.rsb-auth .rsb-top-nav .rsb-logout-icon{
+  position:relative!important;
+  border:2px solid #041713!important;
+  border-top-color:transparent!important;
+  background:linear-gradient(145deg,#fff,#ffd6d6)!important;
+  color:#041713!important;
+}
+.rsb-app.rsb-auth .rsb-top-nav .rsb-logout-icon:before{
+  content:""!important;
+  position:absolute!important;
+  left:50%!important;
+  top:5px!important;
+  width:2px!important;
+  height:12px!important;
+  transform:translateX(-50%)!important;
+  border-radius:999px!important;
+  background:#041713!important;
+}
+@media(max-width:900px){
+  .rsb-app.rsb-auth .rsb-world-header{min-height:0!important;padding:20px 12px 16px!important;border-radius:24px!important}
+  .rsb-header-logo{width:min(100%,390px)!important;min-height:74px!important;padding:12px 16px!important;border-radius:22px!important}
+  .rsb-header-logo img{width:min(300px,76vw)!important;max-height:86px!important}
+  .rsb-app.rsb-auth .rsb-top-nav{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important;width:100%!important;overflow:visible!important;padding:0!important}
+  .rsb-app.rsb-auth .rsb-top-nav .rsb-nav-item{min-height:52px!important;padding:9px 10px!important;border-radius:16px!important;font-size:13px!important;white-space:normal!important}
+  .rsb-app.rsb-auth .rsb-nav-icon{width:30px!important;height:30px!important;min-width:30px!important;border-radius:12px!important;font-size:16px!important}
+}
+@media(max-width:380px){
+  .rsb-app.rsb-auth .rsb-top-nav .rsb-nav-item{font-size:12px!important;gap:7px!important}
+  .rsb-app.rsb-auth .rsb-nav-icon{width:28px!important;height:28px!important;min-width:28px!important}
+}
+
+/* Versao 2026.7 - home deslogada fiel ao layout solicitado. */
+.rsb-app.rsb-guest{
+  position:relative!important;
+  width:100vw!important;
+  max-width:100vw!important;
+  min-height:100svh!important;
+  margin-left:calc(50% - 50vw)!important;
+  margin-right:calc(50% - 50vw)!important;
+  padding:26px!important;
+  display:grid!important;
+  place-items:center!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+  border-radius:0!important;
+  color:#fff!important;
+  background:
+    radial-gradient(circle at 28% 34%,rgba(0,76,30,.44),transparent 0 28%,transparent 58%),
+    radial-gradient(circle at 83% 58%,rgba(46,83,107,.58),transparent 0 34%,transparent 60%),
+    linear-gradient(102deg,#003f1e 0%,#003719 48%,#23495a 75%,#1350d9 100%)!important;
+}
+.rsb-app.rsb-guest:before{
+  content:""!important;
+  position:absolute!important;
+  left:-5vw!important;
+  bottom:-11vh!important;
+  width:42vw!important;
+  min-width:500px!important;
+  height:34vh!important;
+  z-index:0!important;
+  opacity:1!important;
+  transform:skewX(-13deg)!important;
+  transform-origin:left bottom!important;
+  background:
+    linear-gradient(96deg,#fff200 0 43%,#009a3d 44% 100%)!important;
+  filter:drop-shadow(12px -8px 22px rgba(0,0,0,.42))!important;
+  pointer-events:none!important;
+  animation:none!important;
+}
+.rsb-app.rsb-guest:after{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:0!important;
+  pointer-events:none!important;
+  background:
+    linear-gradient(110deg,rgba(255,255,255,.035) 1px,transparent 1px),
+    radial-gradient(circle at 92% 76%,rgba(255,255,255,.14),transparent 0 13%,transparent 30%)!important;
+  background-size:34px 34px,100% 100%!important;
+  opacity:.42!important;
+}
+.rsb-app.rsb-guest .rsb-world-header,
+.rsb-app.rsb-guest .rsb-copa-hero,
+.rsb-app.rsb-guest .rsb-world-footer{
+  display:none!important;
+}
+.rsb-app.rsb-guest .rsb-mobile-start{
+  position:relative!important;
+  z-index:3!important;
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  place-items:center!important;
+  width:min(760px,calc(100vw - 44px))!important;
+  min-height:min(886px,calc(100svh - 96px))!important;
+  max-height:none!important;
+  margin:0 auto!important;
+  padding:54px 58px 64px!important;
+  gap:0!important;
+  text-align:center!important;
+  overflow:visible!important;
+  border-radius:38px!important;
+  border:1px solid rgba(255,213,0,.44)!important;
+  background:
+    radial-gradient(circle at 50% 20%,rgba(60,91,11,.42),transparent 0 23%,transparent 48%),
+    linear-gradient(180deg,rgba(0,42,22,.92),rgba(0,34,18,.94))!important;
+  box-shadow:
+    0 34px 92px rgba(0,0,0,.38),
+    inset 0 1px rgba(255,255,255,.08),
+    inset 0 0 90px rgba(0,0,0,.18)!important;
+  backdrop-filter:blur(22px) saturate(132%)!important;
+}
+.rsb-app.rsb-guest .rsb-mobile-start:before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  border-radius:38px!important;
+  border:0!important;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)!important;
+  pointer-events:none!important;
+}
+.rsb-app.rsb-guest .rsb-mobile-logo{
+  position:static!important;
+  display:grid!important;
+  place-items:center!important;
+  width:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  gap:0!important;
+  text-align:center!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+.rsb-app.rsb-guest .rsb-home-logo-img{
+  display:block!important;
+  width:min(372px,58vw)!important;
+  height:auto!important;
+  margin:0 auto 28px!important;
+  filter:drop-shadow(0 28px 36px rgba(0,0,0,.48))!important;
+}
+.rsb-app.rsb-guest .rsb-home-ball-img{
+  display:none!important;
+}
+.rsb-app.rsb-guest .rsb-legacy-home-bg-ball{
+  display:block!important;
+  position:absolute!important;
+  right:clamp(18px,5vw,92px)!important;
+  bottom:clamp(20px,6vh,62px)!important;
+  width:clamp(128px,11.5vw,230px)!important;
+  height:clamp(128px,11.5vw,230px)!important;
+  z-index:1!important;
+  opacity:1!important;
+  background:url('https://www.resenhasagrada.com.br/wp-content/uploads/2026/06/cropped-bola.png') center/contain no-repeat!important;
+  filter:drop-shadow(0 34px 46px rgba(0,0,0,.48))!important;
+  animation:rsbGuestBallDrift 5.8s ease-in-out infinite!important;
+  pointer-events:none!important;
+}
+.rsb-app.rsb-guest .rsb-mobile-logo small,
+.rsb-app.rsb-guest .rsb-mobile-cup-tag{
+  display:none!important;
+}
+.rsb-guest-badge{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  height:42px!important;
+  padding:0 18px!important;
+  margin:0 auto 26px!important;
+  border-radius:999px!important;
+  border:1px solid rgba(255,213,0,.48)!important;
+  background:rgba(255,213,0,.10)!important;
+  color:#ffea00!important;
+  font-size:15px!important;
+  line-height:1!important;
+  font-weight:900!important;
+  text-transform:uppercase!important;
+  letter-spacing:.055em!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.10)!important;
+}
+.rsb-guest-title{
+  margin:0 0 18px!important;
+  color:#fff!important;
+  font-size:clamp(58px,4.9vw,86px)!important;
+  line-height:.92!important;
+  font-weight:900!important;
+  text-transform:uppercase!important;
+  letter-spacing:0!important;
+  text-shadow:0 8px 26px rgba(0,0,0,.28)!important;
+}
+.rsb-guest-copy{
+  width:min(100%,620px)!important;
+  margin:0 auto 30px!important;
+  color:rgba(255,255,255,.84)!important;
+  font-size:20px!important;
+  line-height:1.45!important;
+  font-weight:800!important;
+  text-align:center!important;
+}
+.rsb-app.rsb-guest .rsb-mobile-actions{
+  position:relative!important;
+  z-index:4!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:auto!important;
+  margin:0!important;
+  gap:14px!important;
+}
+.rsb-app.rsb-guest .rsb-mobile-actions .button{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:auto!important;
+  min-width:136px!important;
+  min-height:54px!important;
+  padding:0 22px!important;
+  border-radius:16px!important;
+  text-decoration:none!important;
+  font-size:14px!important;
+  line-height:1!important;
+  font-weight:500!important;
+  text-transform:uppercase!important;
+  letter-spacing:0!important;
+  box-shadow:none!important;
+}
+.rsb-app.rsb-guest .rsb-mobile-actions .rsb-create-account{
+  background:#ffd400!important;
+  color:#0b1d0e!important;
+  border:1px solid #ffd400!important;
+}
+.rsb-app.rsb-guest .rsb-mobile-actions .rsb-login{
+  background:rgba(255,255,255,.13)!important;
+  color:#fff!important;
+  border:1px solid rgba(255,255,255,.42)!important;
+  backdrop-filter:blur(18px)!important;
+}
+.rsb-app.rsb-guest .rsb-auth-card{
+  position:fixed!important;
+  left:50%!important;
+  top:50%!important;
+  right:auto!important;
+  z-index:30!important;
+  width:min(460px,calc(100vw - 32px))!important;
+  max-height:calc(100svh - 32px)!important;
+  margin:0!important;
+  padding:26px!important;
+  overflow:auto!important;
+  transform:translate(-50%,-50%)!important;
+  border-radius:24px!important;
+  border:1px solid rgba(255,213,0,.36)!important;
+  background:linear-gradient(145deg,rgba(0,42,22,.94),rgba(0,45,74,.88))!important;
+  box-shadow:0 34px 110px rgba(0,0,0,.62),inset 0 1px rgba(255,255,255,.16)!important;
+  backdrop-filter:blur(24px) saturate(130%)!important;
+}
+.rsb-app.rsb-guest .rsb-auth-card:not(.rsb-auth-visible){display:none!important}
+.rsb-app.rsb-guest .rsb-auth-card.rsb-auth-visible{display:block!important}
+@media(max-width:900px){
+  .rsb-app.rsb-guest{
+    padding:18px!important;
+    background:
+      radial-gradient(circle at 20% 20%,rgba(0,76,30,.40),transparent 0 34%,transparent 64%),
+      radial-gradient(circle at 88% 68%,rgba(25,81,160,.66),transparent 0 38%,transparent 66%),
+      linear-gradient(112deg,#003f1e 0%,#003719 48%,#23495a 76%,#1350d9 100%)!important;
+  }
+  .rsb-app.rsb-guest:before{
+    left:-36vw!important;
+    bottom:-9vh!important;
+    width:94vw!important;
+    min-width:0!important;
+    height:28vh!important;
+  }
+  .rsb-app.rsb-guest .rsb-mobile-start{
+    width:min(100%,430px)!important;
+    min-height:auto!important;
+    padding:34px 22px 38px!important;
+    border-radius:28px!important;
+  }
+  .rsb-app.rsb-guest .rsb-mobile-start:before{border-radius:28px!important}
+  .rsb-app.rsb-guest .rsb-home-logo-img{
+    width:min(285px,74vw)!important;
+    margin-bottom:22px!important;
+  }
+  .rsb-guest-badge{
+    height:36px!important;
+    margin-bottom:22px!important;
+    padding:0 15px!important;
+    font-size:13px!important;
+  }
+  .rsb-guest-title{
+    font-size:clamp(44px,14vw,58px)!important;
+    margin-bottom:16px!important;
+  }
+  .rsb-guest-copy{
+    max-width:330px!important;
+    margin-bottom:26px!important;
+    font-size:16px!important;
+    line-height:1.45!important;
+  }
+  .rsb-app.rsb-guest .rsb-mobile-actions{
+    flex-direction:row!important;
+    gap:10px!important;
+  }
+  .rsb-app.rsb-guest .rsb-mobile-actions .button{
+    min-width:122px!important;
+    min-height:50px!important;
+    padding:0 16px!important;
+    border-radius:15px!important;
+    font-size:13px!important;
+  }
+  .rsb-app.rsb-guest .rsb-legacy-home-bg-ball{
+    right:-8px!important;
+    bottom:14px!important;
+    width:96px!important;
+    height:96px!important;
+    opacity:.82!important;
+    animation:rsbGuestBallDriftMobile 5.4s ease-in-out infinite!important;
+  }
+}
+@media(max-width:390px){
+  .rsb-app.rsb-guest .rsb-mobile-start{padding:28px 18px 34px!important}
+  .rsb-app.rsb-guest .rsb-home-logo-img{width:min(250px,72vw)!important}
+  .rsb-guest-title{font-size:42px!important}
+  .rsb-guest-copy{font-size:15px!important}
+  .rsb-app.rsb-guest .rsb-mobile-actions{flex-direction:column!important;width:100%!important}
+  .rsb-app.rsb-guest .rsb-mobile-actions .button{width:min(100%,230px)!important}
+}
+@keyframes rsbGuestBallDrift{
+  0%,100%{transform:translate3d(-18px,0,0) rotate(-5deg)}
+  50%{transform:translate3d(18px,-4px,0) rotate(6deg)}
+}
+@keyframes rsbGuestBallDriftMobile{
+  0%,100%{transform:translate3d(-10px,0,0) rotate(-5deg)}
+  50%{transform:translate3d(10px,-3px,0) rotate(6deg)}
+}
+
+/* Versao 2026.8 - salvamento premium de palpites: autosave, status por jogo e salvar todos. */
+.rsb-bet-tools{
+  position:sticky;
+  top:10px;
+  z-index:8;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin:16px 0;
+  padding:14px 16px;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.20);
+  background:linear-gradient(135deg,rgba(0,55,28,.82),rgba(0,65,130,.52));
+  box-shadow:0 18px 46px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.16);
+  backdrop-filter:blur(22px) saturate(145%);
+}
+.rsb-bet-tools strong{
+  display:block;
+  color:#fff;
+  font-size:16px;
+  font-weight:900;
+}
+.rsb-save-all-status{
+  display:block;
+  margin-top:4px;
+  color:#dfffea;
+  font-size:13px;
+  font-weight:800;
+}
+.rsb-save-status{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:30px;
+  min-width:82px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.08);
+  color:#eafff1;
+  font-size:12px;
+  font-weight:900;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.rsb-status-dirty{color:#ffd500!important;border-color:rgba(255,213,0,.42)!important;background:rgba(255,213,0,.12)!important}
+.rsb-status-saving{color:#dcebff!important;border-color:rgba(0,87,183,.42)!important;background:rgba(0,87,183,.18)!important}
+.rsb-status-saved{color:#88ffaa!important;border-color:rgba(0,200,83,.42)!important;background:rgba(0,200,83,.16)!important}
+.rsb-status-error{color:#ffb4b4!important;border-color:rgba(239,68,68,.48)!important;background:rgba(239,68,68,.16)!important}
+.rsb-bet-form.rsb-dirty{
+  border-color:rgba(255,213,0,.46)!important;
+  box-shadow:0 16px 40px rgba(0,0,0,.24),0 0 0 1px rgba(255,213,0,.14),inset 0 1px rgba(255,255,255,.14)!important;
+}
+.rsb-bet-form.rsb-saving{
+  border-color:rgba(0,87,183,.46)!important;
+}
+.rsb-bet-form.rsb-save-error{
+  border-color:rgba(239,68,68,.54)!important;
+}
+@media(max-width:700px){
+  .rsb-bet-tools{
+    position:relative;
+    top:auto;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+    padding:12px;
+    border-radius:18px;
+  }
+  .rsb-bet-tools .button{
+    width:100%;
+    min-height:46px;
+  }
+  .rsb-save-status{
+    width:100%;
+    min-width:0;
+  }
+}
