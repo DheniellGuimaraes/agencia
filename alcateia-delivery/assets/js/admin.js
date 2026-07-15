@@ -1,0 +1,4 @@
+(function($){
+function loadGrid(){ $('#alcateia-grid').html('<p>Carregando...</p>'); $.get(alcateiaAdmin.ajaxUrl,{action:'alcateia_delivery_grid',nonce:alcateiaAdmin.nonce},function(resp){ if(!resp.success){$('#alcateia-grid').html('<p>Erro ao carregar.</p>');return;} let html='<table class="widefat striped"><tr><th>ID</th><th>Prioridade</th><th>Região</th><th>Peso</th><th>Qtd</th><th>Frete</th><th>Status</th></tr>'; resp.data.forEach(r=>{html+=`<tr><td>${r.id}</td><td>${r.priority}</td><td>${r.region}</td><td>${r.weight_from}-${r.weight_to}</td><td>${r.qty_from}-${r.qty_to}</td><td>${r.shipping_cost}</td><td>${r.active==1?'Ativo':'Inativo'}</td></tr>`}); html+='</table>'; $('#alcateia-grid').html(html);}); }
+$(document).on('click','#alcateia-refresh-grid',loadGrid); $(loadGrid);
+})(jQuery);
