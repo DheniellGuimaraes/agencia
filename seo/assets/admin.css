@@ -1,0 +1,31 @@
+.ses-enriched-content {
+    margin-top: 2.4em;
+    padding-top: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+}
+.ses-enriched-content * {
+    font-family: inherit;
+    color: inherit;
+}
+.ses-enriched-content .ses-section {
+    line-height: inherit;
+}
+.ses-enriched-content h2 {
+    margin-top: 1.8em;
+    margin-bottom: .65em;
+}
+.ses-enriched-content p,
+.ses-enriched-content ul,
+.ses-enriched-content details {
+    margin-bottom: 1em;
+}
+.ses-enriched-content .ses-cta {
+    margin-top: 1.6em;
+    padding: 0 0 0 1em;
+    border-left: 3px solid currentColor;
+    background: transparent;
+    font-weight: inherit;
+}

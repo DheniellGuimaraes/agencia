@@ -1,0 +1,140 @@
+.ses-wrap {
+    min-height: 82vh;
+    margin: 20px 20px 0 0;
+    padding: 28px;
+    color: #eef4ff;
+    background:
+        radial-gradient(circle at top left, rgba(89, 94, 255, .35), transparent 34%),
+        radial-gradient(circle at 80% 20%, rgba(196, 71, 255, .22), transparent 30%),
+        linear-gradient(135deg, #050814 0%, #0b1022 46%, #10071f 100%);
+    border-radius: 18px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .35);
+}
+.ses-wrap h1,
+.ses-wrap h2,
+.ses-wrap p,
+.ses-wrap label,
+.ses-wrap th,
+.ses-wrap td {
+    color: #eef4ff;
+}
+.ses-hero {
+    padding: 18px 0 26px;
+}
+.ses-hero h1 {
+    margin: 0 0 8px;
+    font-size: 36px;
+    line-height: 1.1;
+}
+.ses-hero p {
+    max-width: 780px;
+    margin: 0;
+    color: #b9c6ee;
+    font-size: 15px;
+}
+.ses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 16px;
+    margin: 18px 0;
+}
+.ses-card,
+.ses-panel {
+    background: rgba(255, 255, 255, .09);
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: 14px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 18px 45px rgba(0, 0, 0, .18);
+    backdrop-filter: blur(18px);
+}
+.ses-card {
+    padding: 18px;
+}
+.ses-card span {
+    display: block;
+    color: #b9c6ee;
+    font-size: 13px;
+}
+.ses-card strong {
+    display: block;
+    margin-top: 8px;
+    font-size: 30px;
+    color: #fff;
+}
+.ses-card-green { border-color: rgba(65, 241, 174, .42); }
+.ses-card-pink { border-color: rgba(255, 99, 186, .42); }
+.ses-card-violet { border-color: rgba(174, 117, 255, .48); }
+.ses-card-amber { border-color: rgba(255, 197, 92, .48); }
+.ses-card-red { border-color: rgba(255, 99, 99, .48); }
+.ses-panel {
+    padding: 22px;
+    margin: 18px 0;
+}
+.ses-panel input,
+.ses-panel textarea,
+.ses-panel select {
+    width: 100%;
+    max-width: 520px;
+    margin-top: 8px;
+    color: #f8fbff;
+    background: rgba(3, 8, 24, .52);
+    border: 1px solid rgba(255, 255, 255, .2);
+    border-radius: 10px;
+}
+.ses-panel label {
+    display: block;
+    margin: 0 0 16px;
+    color: #cbd6f7;
+}
+.ses-button,
+.wp-core-ui .ses-wrap .button-primary {
+    color: #fff;
+    background: linear-gradient(135deg, #4c7dff, #bb5cff);
+    border: 0;
+    border-radius: 999px;
+    box-shadow: 0 0 24px rgba(96, 124, 255, .35);
+}
+.ses-table {
+    background: rgba(5, 9, 24, .56);
+    border: 1px solid rgba(255, 255, 255, .14);
+}
+.ses-table th,
+.ses-table td {
+    border-color: rgba(255, 255, 255, .1);
+}
+.ses-badge,
+.ses-tags span {
+    display: inline-block;
+    padding: 8px 12px;
+    margin: 6px 6px 0 0;
+    color: #fff;
+    background: rgba(79, 128, 255, .22);
+    border: 1px solid rgba(116, 150, 255, .4);
+    border-radius: 999px;
+}
+.ses-progress {
+    height: 12px;
+    margin-top: 18px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, .12);
+    border-radius: 999px;
+}
+.ses-progress span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #49f0b5, #6b8cff, #c45cff);
+}
+.ses-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+}
+.ses-checks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 10px;
+    margin: 18px 0;
+}
+@media (max-width: 782px) {
+    .ses-wrap { padding: 18px; margin-right: 10px; }
+    .ses-hero h1 { font-size: 28px; }
+}
